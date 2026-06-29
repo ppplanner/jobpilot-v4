@@ -1098,19 +1098,21 @@ export default function HomePage() {
         {/* ===== 中栏:主内容(压缩) ===== */}
         <div className="flex-1 min-w-0">
 
-      {/* ── 简历工作台(卡外标题 + 深墨绿介绍卡) ── */}
-      <h2 className="text-xl font-bold text-[var(--text-main)] font-cartoon mb-2">简历工作台</h2>
+      {/* ── 多 JD 简历适配入口 ── */}
+      <h2 className="text-xl font-bold text-[var(--text-main)] font-cartoon mb-2">JD 简历适配台</h2>
       <div className="mb-4 rounded-2xl overflow-hidden relative bg-[var(--hero)] text-white px-6 py-6">
-        <svg className="absolute right-5 top-1/2 -translate-y-1/2 w-24 h-24 text-white/10 hidden sm:block" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
+        <div className="absolute right-5 top-5 hidden sm:grid grid-cols-2 gap-2 opacity-25">
+          {['基础简历', '目标 JD', '能力标签', '定制版本'].map(t => (
+            <span key={t} className="rounded-xl border border-white/40 px-3 py-2 text-[10px] font-semibold text-white">{t}</span>
+          ))}
+        </div>
         <div className="relative max-w-md">
           <p className="text-base text-white/90 leading-relaxed mb-5">
-            上传一份简历，针对不同公司 JD 快速生成多个专属版本，AI 改写 + 评分 + 对比差异
+            面向转行新人：用一份基础简历快速匹配多个 JD，拆出岗位要求、能力缺口和最该突出的经历。
           </p>
           <Link href="/resume"
             className="inline-flex items-center gap-1 bg-[var(--accent)] text-[var(--hero)] px-4 py-2 rounded-lg text-xs font-semibold hover:brightness-95 transition-all">
-            {resumeVersions.length > 0 ? "继续优化我的简历" : "立即上传简历开始"} →
+            {resumeVersions.length > 0 ? "继续适配新的 JD" : "建立基础简历"} →
           </Link>
         </div>
       </div>
@@ -1130,6 +1132,9 @@ export default function HomePage() {
         const LIMIT = 3
         const mineShown = showAllMine ? sortedMine : sortedMine.slice(0, LIMIT)
         const jdShown   = showAllJd   ? sortedJd   : sortedJd.slice(0, LIMIT)
+        const gapCount = sortedJd.filter(t => t.status === "缺口").length
+        const partialCount = sortedJd.filter(t => t.status === "部分").length
+        const hitCount = sortedJd.filter(t => t.status === "命中").length
         const jdMat = (t: JdTag) => matHref(matchMyTags.find(m => m.id === t.id)?.materials)
 
         // 单行卡片(参考图样式:实色图标方块 + 标题/副标题 + 右侧药丸)
@@ -1150,14 +1155,27 @@ export default function HomePage() {
 
         return (
           <div className="mb-4">
-            <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon mb-2">能力胶囊</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">能力匹配面板</h3>
+              <Link href="/resume" className="text-xs text-[var(--primary)] hover:underline">换一个 JD →</Link>
+            </div>
             <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
+              <div className="mb-4 rounded-xl bg-[var(--surface2)] px-4 py-3">
+                <p className="text-sm font-semibold text-[var(--text-main)]">我的能力标签 × 岗位要求</p>
+                <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">先看自己已有能力能支撑哪些 JD 要求，再决定这版简历该突出什么、补什么。</p>
+                <div className="mt-3 grid grid-cols-4 gap-2 text-center">
+                  <div className="rounded-lg bg-white/70 px-2 py-2"><p className="text-base font-bold text-[var(--text-main)]">{sortedMine.length}</p><p className="text-[10px] text-[var(--text-muted)]">我的标签</p></div>
+                  <div className="rounded-lg bg-white/70 px-2 py-2"><p className="text-base font-bold text-[var(--text-main)]">{sortedJd.length}</p><p className="text-[10px] text-[var(--text-muted)]">JD 要求</p></div>
+                  <div className="rounded-lg bg-[#E3EDE3] px-2 py-2"><p className="text-base font-bold text-[#3C6B4E]">{hitCount}</p><p className="text-[10px] text-[#3C6B4E]">命中</p></div>
+                  <div className="rounded-lg bg-[#F1E0DA] px-2 py-2"><p className="text-base font-bold text-[#9E4631]">{gapCount + partialCount}</p><p className="text-[10px] text-[#9E4631]">待补齐</p></div>
+                </div>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-[var(--border)]">
                 {/* 左:个人能力 */}
                 <div className="sm:pr-4">
                   <div className="flex items-center justify-between mb-1.5 px-1">
                     <p className="text-xs font-semibold text-[var(--text-sub)]">
-                      个人能力 <span className="text-[var(--text-muted)] font-normal">· 来自素材库</span>
+                      我的能力标签 <span className="text-[var(--text-muted)] font-normal">· 来自素材库</span>
                     </p>
                     <button onClick={refreshMyTags} disabled={capLoading}
                       className="text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] disabled:opacity-50"
@@ -1193,11 +1211,11 @@ export default function HomePage() {
                 {/* 右:所需能力 */}
                 <div className="sm:pl-4 mt-4 pt-4 sm:mt-0 sm:pt-0 border-t sm:border-t-0 border-[var(--border)]">
                   <p className="text-xs font-semibold text-[var(--text-sub)] mb-1.5 px-1">
-                    所需能力 <span className="text-[var(--text-muted)] font-normal">· 来自最近分析的 JD</span>
+                    岗位要求标签 <span className="text-[var(--text-muted)] font-normal">· 最近分析的 JD</span>
                   </p>
                   {sortedJd.length === 0 ? (
                     <p className="text-xs text-[var(--text-muted)] px-1 py-2">
-                      还没有分析过 JD。<Link href="/resume" className="text-[var(--primary)] hover:underline">去简历工作台分析一份 →</Link>
+                      还没有分析过 JD。<Link href="/resume" className="text-[var(--primary)] hover:underline">去适配第一份 JD →</Link>
                     </p>
                   ) : (
                     <>

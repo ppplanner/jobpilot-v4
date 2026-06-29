@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useRef, useCallback, useEffect, Suspense } from "react"
 import Link from "next/link"
@@ -591,6 +591,48 @@ function WordCountPanel({ originalCount, rewrittenCount }: {
   )
 }
 
+function ResumeMatchIllustration() {
+  return (
+    <div className="relative h-36 w-full max-w-sm" aria-hidden="true">
+      <div className="absolute left-3 top-4 w-28 rounded-2xl bg-white/95 p-3 shadow-sm ring-1 ring-white/30">
+        <div className="mb-2 h-2 w-14 rounded-full bg-[#2E5B54]/25" />
+        <div className="space-y-1.5">
+          <div className="h-1.5 rounded-full bg-[#DBE3CD]" />
+          <div className="h-1.5 w-20 rounded-full bg-[#DBE3CD]" />
+          <div className="h-1.5 w-16 rounded-full bg-[#E7DBC4]" />
+        </div>
+        <div className="mt-3 flex gap-1">
+          <span className="h-4 w-8 rounded-full bg-[#E3EDE3]" />
+          <span className="h-4 w-6 rounded-full bg-[#F2E9D6]" />
+        </div>
+      </div>
+      <div className="absolute right-4 top-2 w-32 rounded-2xl bg-[#E9EFDD] p-3 shadow-sm ring-1 ring-white/30">
+        <div className="mb-2 flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-[#B07A52]" />
+          <div className="h-2 w-16 rounded-full bg-[#2E5B54]/25" />
+        </div>
+        <div className="space-y-1.5">
+          <div className="h-1.5 rounded-full bg-white/80" />
+          <div className="h-1.5 w-20 rounded-full bg-white/80" />
+          <div className="h-1.5 w-24 rounded-full bg-white/80" />
+        </div>
+        <div className="mt-3 grid grid-cols-3 gap-1">
+          <span className="h-5 rounded bg-[#4F8063]" />
+          <span className="h-5 rounded bg-[#C0954E]" />
+          <span className="h-5 rounded bg-[#B6634A]" />
+        </div>
+      </div>
+      <svg className="absolute left-[120px] top-12 h-16 w-24 text-white/70" viewBox="0 0 120 72" fill="none">
+        <path d="M6 18C38 18 42 54 74 54C88 54 99 48 112 35" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="5 7" />
+        <path d="M99 29L113 35L101 44" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <div className="absolute bottom-3 left-24 rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-bold text-[var(--hero)] shadow-sm">
+        多 JD 版本适配
+      </div>
+    </div>
+  )
+}
+
 function ResumePageInner() {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [step1Mode, setStep1Mode] = useState<"upload" | "library">("upload")
@@ -997,15 +1039,30 @@ function ResumePageInner() {
           <button onClick={() => setLibToast(null)} className="text-white/50 hover:text-white ml-1">×</button>
         </div>
       )}
-      <h1 className="text-xl font-bold text-[var(--text-main)] mb-1">简历工作台</h1>
-      <p className="text-xs text-[var(--text-muted)] mb-6">拖拽上传简历 → 粘贴 JD（支持截图）→ 左右对比查看 AI 改写结果</p>
+      <div className="mb-6 overflow-hidden rounded-2xl bg-[var(--hero)] px-6 py-6 text-white">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div className="max-w-xl">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">JD Resume Matching Workspace</p>
+            <h1 className="text-2xl font-bold leading-tight mb-3">转行新人多 JD 简历适配台</h1>
+            <p className="text-sm leading-6 text-white/78">
+              保留一份基础简历，针对不同岗位快速拆解 JD 要求、匹配素材经历，并生成可投递的定制版本。
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
+              <span className="rounded-full bg-white/12 px-3 py-1 text-white/85">能力标签对齐</span>
+              <span className="rounded-full bg-white/12 px-3 py-1 text-white/85">岗位缺口识别</span>
+              <span className="rounded-full bg-[var(--accent)] px-3 py-1 text-[var(--hero)]">多版本改写</span>
+            </div>
+          </div>
+          <ResumeMatchIllustration />
+        </div>
+      </div>
 
       {/* 步骤指示器 */}
       <div className="flex items-center gap-2 mb-6">
         {[
-          { num: 1, label: "上传简历" },
-          { num: 2, label: "输入 JD" },
-          { num: 3, label: "对比改写" },
+          { num: 1, label: "基础简历" },
+          { num: 2, label: "目标 JD" },
+          { num: 3, label: "生成版本" },
         ].map((s, idx) => (
           <div key={s.num} className="flex items-center gap-2">
             <button
@@ -1064,7 +1121,7 @@ function ResumePageInner() {
               disabled={!resumeText.trim()}
               className="px-5 py-2 bg-[var(--primary)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
             >
-              下一步 →
+              去匹配 JD →
             </button>
           </div>
         </div>
