@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  /* 自然系三色卡(来自参考色卡):深墨绿 + 浅薄荷绿 + 米杏色 */
+  --primary:    #2E5B54;                    /* 主色:深墨绿(链接/激活/主按钮) */
+  --primary-bg: rgba(46, 91, 84, 0.08);     /* 主色浅底 */
+  --hero:       #234B47;                     /* 更深的墨绿,用于 Hero/工作台大卡 */
+  --accent:     #E7DBC4;                     /* 米杏色,用于强调按钮/点缀 */
+  --accent-dk:  #C9B996;                     /* 米杏深一档,边框/hover */
+
+  --bg:         #F4F7EE;                     /* 页面底:极浅暖薄荷 */
+  --surface:    #FFFFFF;                     /* 卡片:纯白,保证内容清晰 */
+  --surface2:   #E9EFDD;                     /* 次级面:浅薄荷绿(参考图浅色区块) */
+  --border:     #DBE3CD;                     /* 描边:薄荷灰绿 */
+  --text-main:  #20302D;                     /* 主文字:墨绿近黑 */
+  --text-sub:   #4C5C57;                     /* 次文字 */
+  --text-muted: #8B998F;                     /* 弱文字 */
+
+  /* 保留旧变量别名，防止其他页面引用报错 */
+  --primary-old: #C17A3B;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Inter", sans-serif;
+}
+
+/* 灵动卡通字体(站酷快乐体),用于各模块标题 */
+.font-cartoon {
+  font-family: var(--font-cartoon), "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.upload-zone:hover {
+  border-color: var(--primary);
+  background: var(--primary-bg);
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+.cursor-blink::after {
+  content: "|";
+  animation: blink 1s infinite;
+  color: var(--primary);
+}

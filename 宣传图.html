@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JobPilot 宣传图</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: #F8F4EE;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    /* 整体卡片容器 1080×1920 比例（手机竖屏） */
+    .card {
+      width: 540px;
+      background: linear-gradient(160deg, #FFF9F4 0%, #F8F4EE 100%);
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(193,122,59,0.15), 0 8px 20px rgba(0,0,0,0.08);
+      position: relative;
+    }
+
+    /* 顶部渐变横幅 */
+    .hero {
+      background: linear-gradient(135deg, #E07B39 0%, #C06030 50%, #A04828 100%);
+      padding: 48px 36px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 140px; height: 140px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .logo-icon {
+      font-size: 36px;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+    }
+    .logo-text {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    .logo-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-headline {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .hero-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.6;
+    }
+
+    .url-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* 功能区 */
+    .features {
+      padding: 32px 28px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #A89A8C;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .feature-card {
+      background: #fff;
+      border: 1.5px solid #E2DAD0;
+      border-radius: 16px;
+      padding: 18px 16px;
+      transition: all 0.2s;
+    }
+    .feature-card.highlight {
+      border-color: #C17A3B;
+      background: linear-gradient(135deg, #FFF9F4, #FEF3C7);
+    }
+
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .feature-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2C2420;
+      margin-bottom: 5px;
+    }
+    .feature-desc {
+      font-size: 11.5px;
+      color: #A89A8C;
+      line-height: 1.5;
+    }
+    .feature-card.highlight .feature-name {
+      color: #C17A3B;
+    }
+    .feature-card.highlight .feature-desc {
+      color: #6B5D52;
+    }
+
+    /* 新功能标签 */
+    .new-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E07B39, #C06030);
+      color: #fff;
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* 亮点横幅 */
+    .highlight-banner {
+      background: linear-gradient(135deg, #FEF3C7, #FFF9F4);
+      border: 1.5px solid #F0CC70;
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+    .highlight-banner-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #C17A3B;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .highlight-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .highlight-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12.5px;
+      color: #6B5D52;
+      line-height: 1.4;
+    }
+    .highlight-list li::before {
+      content: "✦";
+      color: #C17A3B;
+      font-size: 10px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    /* 使用说明 */
+    .steps {
+      background: #fff;
+      border: 1.5px solid #E2DAD0;
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+    .step-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .step-row:last-child { margin-bottom: 0; }
+    .step-num {
+      width: 22px; height: 22px;
+      background: linear-gradient(135deg, #E07B39, #C06030);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-text {
+      font-size: 12.5px;
+      color: #2C2420;
+      line-height: 1.5;
+    }
+    .step-text strong { color: #C17A3B; }
+
+    /* 底部CTA */
+    .cta {
+      background: linear-gradient(135deg, #2C2420, #3D2F28);
+      padding: 28px 28px 36px;
+      text-align: center;
+    }
+    .cta-text {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 14px;
+    }
+    .cta-url {
+      font-size: 18px;
+      font-weight: 800;
+      color: #F0A060;
+      letter-spacing: 0.3px;
+      margin-bottom: 18px;
+      word-break: break-all;
+    }
+    .cta-tags {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* 装饰线 */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #E2DAD0 30%, #E2DAD0 70%, transparent);
+      margin: 4px 0 20px;
+    }
+
+    /* 打印/截图按钮（不会出现在截图中） */
+    .screenshot-hint {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #A89A8C;
+    }
+    .screenshot-hint button {
+      margin-top: 8px;
+      padding: 10px 24px;
+      background: linear-gradient(135deg, #E07B39, #C06030);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    @media print {
+      .screenshot-hint { display: none; }
+      body { background: white; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div>
+  <div class="card" id="poster">
+
+    <!-- 顶部 Hero -->
+    <div class="hero">
+      <div class="logo-row">
+        <span class="logo-icon">🚀</span>
+        <span class="logo-text">JobPilot</span>
+        <span class="logo-badge">v2.0</span>
+      </div>
+      <div class="hero-headline">AI 驱动的<br>求职全流程助手</div>
+      <div class="hero-sub">简历改写 · 投递追踪 · 面试刷题<br>专为产品经理秋招设计，免费开放测试</div>
+      <div class="url-pill">
+        🌐 &nbsp;jobpilot-v2-sepia.vercel.app
+      </div>
+    </div>
+
+    <!-- 功能卡片 -->
+    <div class="features">
+      <div class="section-title">核心功能</div>
+
+      <div class="feature-grid">
+        <div class="feature-card highlight">
+          <span class="feature-icon">📋</span>
+          <div class="feature-name">简历 AI 改写 <span class="new-badge">NEW</span></div>
+          <div class="feature-desc">拖拽上传 PDF/Word，AI 左右对比改写，高亮新增内容</div>
+        </div>
+        <div class="feature-card highlight">
+          <span class="feature-icon">📸</span>
+          <div class="feature-name">JD 截图粘贴 <span class="new-badge">NEW</span></div>
+          <div class="feature-desc">截图直接 Ctrl+V，AI 自动识别 JD 文字，一秒填入</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📊</span>
+          <div class="feature-name">投递看板</div>
+          <div class="feature-desc">记录全部投递进度，按状态/档位筛选，不漏任何面试</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🎯</span>
+          <div class="feature-name">刷题备考</div>
+          <div class="feature-desc">PM 面试题库，含情景题、数据题、压力反问等4种题型</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔍</span>
+          <div class="feature-name">JD 匹配分析</div>
+          <div class="feature-desc">AI 对比简历与 JD，精准定位差距，给出修改方向</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">👤</span>
+          <div class="feature-name">求职档案</div>
+          <div class="feature-desc">维护实习/项目/技能经历，供 AI 改写时参考调用</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 亮点 -->
+      <div class="highlight-banner">
+        <div class="highlight-banner-title">✨ 面试官视角分析</div>
+        <ul class="highlight-list">
+          <li>AI 扮演面试官审视你的简历，找出薄弱点</li>
+          <li>每条经历生成「追问预警」，提前准备应答</li>
+          <li>识别「空话弱信号词」vs「强信号数据词」</li>
+        </ul>
+      </div>
+
+      <!-- 使用步骤 -->
+      <div class="section-title">3步开始使用</div>
+      <div class="steps">
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-text">访问链接，在<strong>「⚙️ 设置」</strong>填入你的 DeepSeek API Key（充值10元够用很久）</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-text">进入<strong>「简历工作台」</strong>，拖拽上传简历 PDF，截图粘贴目标 JD</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-text">点击生成，左右对比查看 <strong>AI 改写结果</strong>，顺手去「刷题备考」练几道</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 底部 CTA -->
+    <div class="cta">
+      <div class="cta-text">复制链接，马上体验 👇</div>
+      <div class="cta-url">jobpilot-v2-sepia.vercel.app</div>
+      <div class="cta-tags">
+        <span class="tag">#产品经理</span>
+        <span class="tag">#秋招</span>
+        <span class="tag">#简历优化</span>
+        <span class="tag">#AI求职</span>
+        <span class="tag">#免费开放</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 截图提示（不会出现在图里） -->
+  <div class="screenshot-hint">
+    💡 按 <strong>Ctrl+Shift+P</strong> 搜索「截图」，或直接对浏览器页面截图保存<br>
+    <button onclick="window.print()">🖨 打印 / 保存为 PDF</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "trailingSlash": false,
+  "env": {
+    "BACKEND_URL": "https://jobpilot-v2-production.up.railway.app"
+  }
+}

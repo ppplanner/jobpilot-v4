@@ -1,0 +1,35 @@
+# ── 密钥 / 环境变量(含数据库密码、LLM key,绝不入库)──
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env.local
+
+# ── 依赖 ──
+node_modules/
+
+# ── 前端构建产物 ──
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# ── 本地数据库(正式数据在云端 Supabase,本地仅兜底,不入库)──
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+backend/data/backups/
+
+# ── 部署 / 编辑器 / 系统 ──
+.vercel
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
