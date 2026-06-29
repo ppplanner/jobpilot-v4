@@ -37,6 +37,7 @@
 ## 改动日志
 
 ### 2026-06-29(晚)
+- **能力匹配面板底部与求职日历底部对齐**:`page.tsx` 能力匹配面板卡片高度 `lg:h-[430px]`→`lg:h-[260px]`。原因:能力面板在中栏(其上有「JD简历适配台」标题+Hero卡,起点 top≈268),求职日历在右栏(其上仅 h3 标题,起点 top≈64),即使日历卡更高,能力面板底部仍超出日历约 170px。用 Playwright 量两卡 `getBoundingClientRect` 算出:能力面板设 260px 时底部=528,与日历卡底部(528)精确齐平。能力面板内层 grid 是 `overflow-y-auto`,标签多了内部滚动,缩高不影响内容。(注:能力面板现为空态时也不再显得过空。)
 - **首页求职日历改为记事本式 + 修复无法删除**:`page.tsx` 的 `HomeCalendar` 原本底部是「＋面试 / ＋AI测评」两个**预设标签按钮**(点一下直接塞一个 title=标签名的事件),且每条事件**没有删除入口**(父组件 `handleDeleteCustomEvent` 已存在却没传进组件)。现改为:① 底部一个**文本输入框 + 添加按钮**(回车也可提交),直接写自由日程内容(如「字节一面 14:00」),type 统一存「日程」;② 每条事件前加圆点、显示 title 全文,hover 出现 × 删除按钮(接到 `onDelete`→`handleDeleteCustomEvent`→`api.calendar.delete`)。删了无用的 `tagCls`。后端 `custom_calendar_events` CRUD 未动(create/delete 实测正常)。旧的 4 条 面试/AI测评 标签数据(2026-06-25)会以其 title 文本显示,可用新的 × 删除。**注**:`/calendar` 整页(`app/calendar/page.tsx`)的添加弹窗仍保留 类型下拉(面试/截止/备考/其他),本次只改首页卡;如也要改成记事本式可再提。
 
 ### 2026-06-29(下午)

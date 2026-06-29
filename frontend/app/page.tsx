@@ -1132,9 +1132,6 @@ export default function HomePage() {
         const LIMIT = 3
         const mineShown = showAllMine ? sortedMine : sortedMine.slice(0, LIMIT)
         const jdShown   = showAllJd   ? sortedJd   : sortedJd.slice(0, LIMIT)
-        const gapCount = sortedJd.filter(t => t.status === "缺口").length
-        const partialCount = sortedJd.filter(t => t.status === "部分").length
-        const hitCount = sortedJd.filter(t => t.status === "命中").length
         const jdMat = (t: JdTag) => matHref(matchMyTags.find(m => m.id === t.id)?.materials)
 
         // 单行卡片(参考图样式:实色图标方块 + 标题/副标题 + 右侧药丸)
@@ -1159,18 +1156,8 @@ export default function HomePage() {
               <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">能力匹配面板</h3>
               <Link href="/resume" className="text-xs text-[var(--primary)] hover:underline">换一个 JD →</Link>
             </div>
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
-              <div className="mb-4 rounded-xl bg-[var(--surface2)] px-4 py-3">
-                <p className="text-sm font-semibold text-[var(--text-main)]">我的能力标签 × 岗位要求</p>
-                <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">先看自己已有能力能支撑哪些 JD 要求，再决定这版简历该突出什么、补什么。</p>
-                <div className="mt-3 grid grid-cols-4 gap-2 text-center">
-                  <div className="rounded-lg bg-white/70 px-2 py-2"><p className="text-base font-bold text-[var(--text-main)]">{sortedMine.length}</p><p className="text-[10px] text-[var(--text-muted)]">我的标签</p></div>
-                  <div className="rounded-lg bg-white/70 px-2 py-2"><p className="text-base font-bold text-[var(--text-main)]">{sortedJd.length}</p><p className="text-[10px] text-[var(--text-muted)]">JD 要求</p></div>
-                  <div className="rounded-lg bg-[#E3EDE3] px-2 py-2"><p className="text-base font-bold text-[#3C6B4E]">{hitCount}</p><p className="text-[10px] text-[#3C6B4E]">命中</p></div>
-                  <div className="rounded-lg bg-[#F1E0DA] px-2 py-2"><p className="text-base font-bold text-[#9E4631]">{gapCount + partialCount}</p><p className="text-[10px] text-[#9E4631]">待补齐</p></div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-[var(--border)]">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 lg:h-[260px] flex flex-col">
+              <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-[var(--border)] flex-1 min-h-0 overflow-y-auto">
                 {/* 左:个人能力 */}
                 <div className="sm:pr-4">
                   <div className="flex items-center justify-between mb-1.5 px-1">
