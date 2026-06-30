@@ -591,6 +591,44 @@ function WordCountPanel({ originalCount, rewrittenCount }: {
   )
 }
 
+function PlanningFigure({ className = "", accent = "#E36B2C", pose = "point" }: { className?: string; accent?: string; pose?: "point" | "carry" | "mark" }) {
+  return (
+    <svg className={className} viewBox="0 0 44 56" fill="none" aria-hidden="true">
+      <path d="M8 51h28" stroke="#102F59" strokeWidth="1.4" strokeLinecap="round" opacity="0.2" />
+      {pose === "carry" && (
+        <>
+          <circle cx="21" cy="9" r="4" fill="#F7F1E8" stroke="#102F59" strokeWidth="1.6" />
+          <path d="M17.6 8c2-3 6.4-1.6 7.2 1.2" fill="#102F59" />
+          <path d="M21 13.5l-4 16h10l-1.7-14" fill={accent} opacity="0.9" />
+          <rect x="7" y="24" width="10" height="12" rx="1.8" fill="#F7F1E8" stroke="#102F59" strokeWidth="1.4" />
+          <path d="M17.7 19.5l-5.4 5M25.4 19.2l7.2 6.2M17 30l-7 17M27 30l8 16" stroke="#102F59" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M32.5 25.5l5-2.8" stroke={accent} strokeWidth="2.4" strokeLinecap="round" />
+        </>
+      )}
+      {pose === "mark" && (
+        <>
+          <rect x="25.5" y="10" width="12" height="16" rx="2" fill="#F7F1E8" stroke="#102F59" strokeWidth="1.4" />
+          <path d="M29 15h5M29 19h3.5" stroke={accent} strokeWidth="1.5" strokeLinecap="round" />
+          <circle cx="16" cy="10" r="4" fill="#F7F1E8" stroke="#102F59" strokeWidth="1.6" />
+          <path d="M12.5 9.3c1.4-3.3 6.2-2.5 7 .6" fill="#102F59" />
+          <path d="M16 14.5l-5 15h11l-2.2-13.5" fill={accent} opacity="0.88" />
+          <path d="M19.5 20l8-2.8M12 20.5l-5 5M11 30l-4 17M22 30l4.5 17" stroke="#102F59" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="36.5" cy="31" r="2.4" fill={accent} />
+        </>
+      )}
+      {pose === "point" && (
+        <>
+          <circle cx="22" cy="9" r="4" fill="#F7F1E8" stroke="#102F59" strokeWidth="1.6" />
+          <path d="M18.8 8.2c1.2-3.2 6.2-2.4 6.8.6" stroke="#102F59" strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M22 13.5v16M14.5 21.5h15M18 29.5l-5 18M26 29.5l5 18" stroke="#102F59" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M29.5 20.5l6-3.5" stroke={accent} strokeWidth="2.4" strokeLinecap="round" />
+          <circle cx="37" cy="16" r="2.4" fill={accent} />
+        </>
+      )}
+    </svg>
+  )
+}
+
 function ResumeMatchIllustration() {
   return (
     <div className="relative h-36 w-full max-w-sm" aria-hidden="true">
@@ -626,6 +664,8 @@ function ResumeMatchIllustration() {
         <path d="M6 18C38 18 42 54 74 54C88 54 99 48 112 35" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="5 7" />
         <path d="M99 29L113 35L101 44" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
+      <PlanningFigure className="absolute bottom-1 left-8 h-14 w-11" pose="carry" />
+      <PlanningFigure className="absolute bottom-1 right-12 h-12 w-10" accent="#C0954E" pose="mark" />
       <div className="absolute bottom-3 left-24 rounded-2xl bg-[var(--accent)] px-4 py-2 text-xs font-bold text-[var(--hero)] shadow-sm">
         多 JD 版本适配
       </div>

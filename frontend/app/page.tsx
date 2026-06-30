@@ -24,6 +24,82 @@ const STATUS_STYLE: Record<string, { icon: string; pill: string; label: string }
 }
 const DOMAIN_ORDER = ["direction", "method", "domain", "tooling", "soft"]
 
+type SketchTone = "green" | "ochre" | "terra" | "muted"
+type SketchPose = "point" | "read" | "carry" | "mark"
+
+function PlanPersonIcon({ tone = "green", pose = "point" }: { tone?: SketchTone; pose?: SketchPose }) {
+  const accent = tone === "ochre" ? "#C0954E" : tone === "terra" ? "#B6634A" : tone === "muted" ? "#9C8B70" : "#2E5B54"
+  const navy = "#102F59"
+  const skin = "#F7F1E8"
+  const isWarm = tone === "ochre" || tone === "terra"
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+      <path d="M4.5 23.2h19" stroke={navy} strokeWidth="1.1" strokeLinecap="round" opacity="0.16" />
+      {pose === "read" && (
+        <>
+          <rect x="15.4" y="8.5" width="7.1" height="10.5" rx="1.1" fill="white" stroke={navy} strokeWidth="1.1" />
+          <path d="M17.4 11.3h3.2M17.4 14h2.7" stroke={accent} strokeWidth="1.1" strokeLinecap="round" />
+          <circle cx="10" cy="7.1" r="2.15" fill={skin} stroke={navy} strokeWidth="1.25" />
+          <path d="M8.1 6.5c.6-2 3.6-2 4 .4" stroke={navy} strokeWidth="1.25" strokeLinecap="round" />
+          <path d="M10.1 9.5l-1 6.7h4.8l-1.4-6.1" fill={accent} opacity="0.88" />
+          <path d="M10.3 10.1l-2.7 4.1M12.6 11.3l3.2 2M9.2 16.1l-2 5.5M13.7 16.1l1.6 5.5" stroke={navy} strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      )}
+      {pose === "carry" && (
+        <>
+          <circle cx="13.6" cy="7.1" r="2.15" fill={skin} stroke={navy} strokeWidth="1.25" />
+          <path d="M12.1 5.7c1.2-1.3 3.6-.5 3.9 1.2" fill={navy} />
+          <path d="M13.4 9.6l-1.8 6.5h5.3l-.8-5.9" fill={isWarm ? navy : accent} opacity="0.95" />
+          <rect x="5.4" y="13.3" width="5.2" height="6.2" rx="1" fill={accent} stroke={navy} strokeWidth="1.05" />
+          <path d="M11.8 11.3l-3.1 2.2M16.1 11.1l3.8 3.2M12 16.1l-3.1 5.8M16.6 16.1l3.8 5.4" stroke={navy} strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M20 14.3l2.2-1.2" stroke={accent} strokeWidth="1.8" strokeLinecap="round" />
+        </>
+      )}
+      {pose === "mark" && (
+        <>
+          <rect x="14.8" y="6.2" width="8" height="8.8" rx="1.1" fill="white" stroke={navy} strokeWidth="1.1" />
+          <path d="M17 9h3.2M17 11.7h2" stroke={accent} strokeWidth="1.1" strokeLinecap="round" />
+          <circle cx="9.4" cy="8.2" r="2.15" fill={skin} stroke={navy} strokeWidth="1.25" />
+          <path d="M7.6 7.2c1-1.9 3.8-1.5 4.1.4" fill={navy} />
+          <path d="M9.6 10.6l-2.7 5.7h5.4l-.5-4.8" fill={accent} opacity="0.9" />
+          <path d="M11.7 11.6l4.2-1.1M8 13.2l-3.1 2.3M7.1 16.2l-2.3 5.4M12.2 16.2l2.2 5.4" stroke={navy} strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="21.8" cy="17.7" r="1.45" fill={accent} />
+        </>
+      )}
+      {pose === "point" && (
+        <>
+          <circle cx="13.8" cy="7" r="2.2" fill={skin} stroke={navy} strokeWidth="1.25" />
+          <path d="M11.9 6.3c.7-2 3.9-1.7 4.2.5" stroke={navy} strokeWidth="1.25" strokeLinecap="round" />
+          <path d="M13.9 9.6v6.3" stroke={navy} strokeWidth="1.25" strokeLinecap="round" />
+          <path d="M11.1 13.1l2.8-2.2l3.2 2.5" stroke={accent} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M12.1 15.8l-2.4 5.5M15.7 15.8l2.5 5.5" stroke={navy} strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M17.5 12.4l3.8-2.1" stroke={accent} strokeWidth="1.9" strokeLinecap="round" />
+          <circle cx="22.1" cy="9.9" r="1.55" fill={accent} />
+        </>
+      )}
+    </svg>
+  )
+}
+
+function VersionSketch({ tier }: { tier: "high" | "mid" | "low" | "none" }) {
+  const tone: SketchTone = tier === "high" ? "green" : tier === "mid" ? "ochre" : tier === "low" ? "terra" : "muted"
+  const pose: SketchPose = tier === "high" ? "mark" : tier === "mid" ? "read" : tier === "low" ? "carry" : "point"
+  const accent = tone === "ochre" ? "#C0954E" : tone === "terra" ? "#B6634A" : tone === "muted" ? "#9C8B70" : "#4F8063"
+  return (
+    <div className="relative h-full w-full overflow-hidden" aria-hidden="true">
+      <div className="absolute inset-x-4 top-4 h-12 rounded-lg border border-white/70 bg-white/40" />
+      <div className="absolute left-7 top-7 h-1.5 w-14 rounded-full bg-white/80" />
+      <div className="absolute left-7 top-11 h-1.5 w-9 rounded-full bg-white/70" />
+      <div className="absolute right-6 top-5 h-10 w-6 rounded-b-full border border-[#102F59]/20 bg-white/30" />
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
+        <PlanPersonIcon tone={tone} pose={pose} />
+      </div>
+      <span className="absolute right-5 bottom-5 h-2.5 w-2.5 rounded-full" style={{ background: accent }} />
+    </div>
+  )
+}
+
+
 // ===== 练习方向标签 =====
 const INTENT_TAGS = [
   { key: "B端PM",   label: "B端PM",   cat: "B端PM" },
@@ -1134,14 +1210,14 @@ export default function HomePage() {
         const jdShown   = showAllJd   ? sortedJd   : sortedJd.slice(0, LIMIT)
         const jdMat = (t: JdTag) => matHref(matchMyTags.find(m => m.id === t.id)?.materials)
 
-        // 单行卡片(参考图样式:实色图标方块 + 标题/副标题 + 右侧药丸)
-        const Row = ({ href, icon, iconBg, title, subtitle, pill, pillCls }: {
-          href: string; icon: string; iconBg: string; title: string
-          subtitle: string; pill: string; pillCls: string
+        // 单行卡片(规划图式小人 + 标题/副标题 + 右侧药丸)
+        const Row = ({ href, icon, iconBg, tone, pose, title, subtitle, pill, pillCls }: {
+          href: string; icon: string; iconBg: string; tone: SketchTone; pose: SketchPose
+          title: string; subtitle: string; pill: string; pillCls: string
         }) => (
           <Link href={href}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--surface2)] transition-colors">
-            <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold text-white shrink-0 ${iconBg}`}>{icon}</span>
+            <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`} title={icon}><PlanPersonIcon tone={tone} pose={pose} /></span>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[var(--text-main)] truncate">{title}</p>
               <p className="text-xs text-[var(--text-muted)] truncate">{subtitle}</p>
@@ -1178,12 +1254,14 @@ export default function HomePage() {
                     <>
                       {mineShown.map(t => {
                         const st = DOMAIN_STYLE[t.domain]
+                        const tone = t.domain === "domain" ? "ochre" : t.domain === "soft" ? "muted" : "green"
+                        const pose: SketchPose = t.domain === "method" ? "mark" : t.domain === "tooling" ? "carry" : t.domain === "soft" ? "point" : "read"
                         const sub = t.materials.length
                           ? `${st.name}${t.strength === "弱" ? " · 待强化" : ""} · ${t.materials.length} 段经历`
                           : `${st.name} · 通用素养`
                         return (
                           <Row key={t.id} href={matHref(t.materials)} icon={t.label[0]} iconBg={st.icon}
-                            title={t.label} subtitle={sub} pill="查看经历" pillCls={st.pill} />
+                            tone={tone} pose={pose} title={t.label} subtitle={sub} pill="查看经历" pillCls={st.pill} />
                         )
                       })}
                       {sortedMine.length > LIMIT && (
@@ -1208,10 +1286,12 @@ export default function HomePage() {
                     <>
                       {jdShown.map(t => {
                         const st = STATUS_STYLE[t.status]
+                        const tone: SketchTone = t.status === "缺口" ? "terra" : t.status === "部分" ? "ochre" : "green"
+                        const pose: SketchPose = t.status === "缺口" ? "point" : t.status === "部分" ? "read" : "mark"
                         return (
                           <Row key={t.id} href={jdMat(t)} icon={t.label[0]} iconBg={st.icon}
                             title={t.label} subtitle={`${t.priority} · ${DOMAIN_STYLE[t.domain].name}`}
-                            pill={st.label} pillCls={st.pill} />
+                            tone={tone} pose={pose} pill={st.label} pillCls={st.pill} />
                         )
                       })}
                       {sortedJd.length > LIMIT && (
@@ -1276,17 +1356,17 @@ export default function HomePage() {
                 // 分数三档:0-60 / 60-80 / 80+,每档不同图画(先占位 emoji,后续替换为图片)
                 const tier = score == null ? "none" : score >= 80 ? "high" : score >= 60 ? "mid" : "low"
                 const cfg = {
-                  high: { bg: "bg-[#E3EDE3]", emoji: "🏆", bar: "#4F8063", text: "text-[#3C6B4E]" },
-                  mid:  { bg: "bg-[#F2E9D6]", emoji: "⭐", bar: "#C0954E", text: "text-[#876426]" },
-                  low:  { bg: "bg-[#F1E0DA]", emoji: "🌱", bar: "#B6634A", text: "text-[#9E4631]" },
-                  none: { bg: "bg-[var(--surface2)]", emoji: "📄", bar: "#9ca3af", text: "text-[var(--text-muted)]" },
+                  high: { bg: "bg-[#E3EDE3]", bar: "#4F8063", text: "text-[#3C6B4E]" },
+                  mid:  { bg: "bg-[#F2E9D6]", bar: "#C0954E", text: "text-[#876426]" },
+                  low:  { bg: "bg-[#F1E0DA]", bar: "#B6634A", text: "text-[#9E4631]" },
+                  none: { bg: "bg-[var(--surface2)]", bar: "#9ca3af", text: "text-[var(--text-muted)]" },
                 }[tier]
                 return (
                   <Link href={`/resume?version_id=${v.id}`} key={v.id}
                     className="w-40 shrink-0 bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden hover:border-[var(--text-main)]/20 transition-colors">
-                    {/* 上部图画区:按分数档显示(先占位 emoji,后续换成各档配图) */}
+                    {/* 上部图画区:按分数档显示(规划图式小插画) */}
                     <div className={`h-20 flex items-center justify-center ${cfg.bg}`}>
-                      <span className="text-3xl">{cfg.emoji}</span>
+                      <VersionSketch tier={tier} />
                     </div>
                     <div className="p-3">
                       {/* 分数进度条 */}
@@ -1311,7 +1391,7 @@ export default function HomePage() {
               {[0, 1].map(i => (
                 <Link href="/resume" key={i}
                   className="w-40 shrink-0 flex flex-col items-center justify-center gap-2 h-28 bg-[var(--surface2)] border border-dashed border-[var(--border)] rounded-xl hover:border-[var(--primary)]/40 transition-colors">
-                  <span className="text-2xl text-[var(--text-muted)]/50">📄</span>
+                  <PlanPersonIcon tone="muted" />
                   <span className="text-xs text-[var(--text-muted)]">{i === 0 ? "还没有简历版本" : "去生成第一份 →"}</span>
                 </Link>
               ))}

@@ -13,6 +13,26 @@ function Icon({ d, className = "" }: { d: string | string[]; className?: string 
   )
 }
 
+function BrandMark({ className = "" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 28 28" fill="none" aria-hidden="true">
+      <rect x="5" y="4" width="14" height="18" rx="3" fill="#F7F1E8" stroke="#102F59" strokeWidth="1.5" />
+      <path d="M9 10h6M9 14h8M9 18h5" stroke="#102F59" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M17 7l5 4-5 4" stroke="#E36B2C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="21" cy="21" r="2" fill="#E36B2C" />
+    </svg>
+  )
+}
+
+function RoleMark() {
+  return (
+    <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M2.5 10.5L7.5 3l6 10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="7.5" cy="3" r="1.6" fill="#E36B2C" />
+    </svg>
+  )
+}
+
 const NAV = [
   {
     href: "/",
@@ -69,7 +89,7 @@ export default function Sidebar() {
       ">
         {/* Logo */}
         <div className="h-14 flex items-center px-[18px] shrink-0 border-b border-gray-50">
-          <span className="text-[20px] shrink-0">🚀</span>
+          <BrandMark className="w-7 h-7 shrink-0" />
           <span className="ml-3 font-bold text-gray-800 text-sm whitespace-nowrap">
             JobPilot
           </span>
@@ -85,8 +105,8 @@ export default function Sidebar() {
               <p className="text-sm font-semibold text-gray-800 leading-tight">
                 {profile.name ? `Hi，${profile.name}` : "Hi，未来的产品经理"}
               </p>
-              <Link href="/profile" className="text-xs text-[var(--primary)] hover:underline">
-                🎯 {role}
+              <Link href="/profile" className="inline-flex items-center gap-1 text-xs text-[var(--primary)] hover:underline">
+                <RoleMark /> {role}
               </Link>
             </div>
           </div>
@@ -141,7 +161,7 @@ export default function Sidebar() {
       <nav className="sm:hidden sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
         <div className="flex items-center h-12 px-4 gap-1 overflow-x-auto">
           <Link href="/" className="flex items-center gap-1.5 mr-3 shrink-0">
-            <span className="text-lg">🚀</span>
+            <BrandMark className="w-6 h-6" />
             <span className="font-bold text-gray-800 text-sm">JobPilot</span>
           </Link>
           {NAV.map(item => {
