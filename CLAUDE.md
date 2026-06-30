@@ -36,6 +36,9 @@
 
 ## 改动日志
 
+### 2026-06-30
+- **首次打开引导弹窗(3 页轮播)替换「新功能上线」弹窗**:`page.tsx` 新增 `OnboardingGuideModal` + 三个高仿真示意图子组件 `RewriteMock`/`InterviewerMock`/`JdAnalysisMock`,用代码复刻三大核心功能的真实界面布局(① 简历改写双栏对比+黄色高亮新增词;② 面试官视角分析:总分78+命中/较弱/缺失矩阵+追问预警;③ JD分析:圆形评分环72+逐项匹配+必须补充/可突出)。内容用真实示例(城乡规划转PM)并隐去关键信息(院校/地名→「某规划设计院」「某互联网大厂」)。第 1、2 页按钮「跳过\|下一步」,**第 3 页变「立即开始 →」**(`<Link href="/resume" onClick={onClose}>`)跳简历工作台。首屏触发改用新 key `jobpilot_onboarding_v1_done`(原 `showNewFeature`/`jobpilot_nf_v2_dismissed`/`NewFeatureModal` 已移除,`/onboarding` 独立导览页保留)。示意图为代码复刻非截图(轻量、随主题、不随UI改版过期)。Playwright 实测:三页切换、进度条、立即开始跳转/resume+标记已读+刷新不再弹,全部通过。
+
 ### 2026-06-29(晚)
 - **能力匹配面板底部与求职日历底部对齐**:`page.tsx` 能力匹配面板卡片高度 `lg:h-[430px]`→`lg:h-[260px]`。原因:能力面板在中栏(其上有「JD简历适配台」标题+Hero卡,起点 top≈268),求职日历在右栏(其上仅 h3 标题,起点 top≈64),即使日历卡更高,能力面板底部仍超出日历约 170px。用 Playwright 量两卡 `getBoundingClientRect` 算出:能力面板设 260px 时底部=528,与日历卡底部(528)精确齐平。能力面板内层 grid 是 `overflow-y-auto`,标签多了内部滚动,缩高不影响内容。(注:能力面板现为空态时也不再显得过空。)
 - **首页求职日历改为记事本式 + 修复无法删除**:`page.tsx` 的 `HomeCalendar` 原本底部是「＋面试 / ＋AI测评」两个**预设标签按钮**(点一下直接塞一个 title=标签名的事件),且每条事件**没有删除入口**(父组件 `handleDeleteCustomEvent` 已存在却没传进组件)。现改为:① 底部一个**文本输入框 + 添加按钮**(回车也可提交),直接写自由日程内容(如「字节一面 14:00」),type 统一存「日程」;② 每条事件前加圆点、显示 title 全文,hover 出现 × 删除按钮(接到 `onDelete`→`handleDeleteCustomEvent`→`api.calendar.delete`)。删了无用的 `tagCls`。后端 `custom_calendar_events` CRUD 未动(create/delete 实测正常)。旧的 4 条 面试/AI测评 标签数据(2026-06-25)会以其 title 文本显示,可用新的 × 删除。**注**:`/calendar` 整页(`app/calendar/page.tsx`)的添加弹窗仍保留 类型下拉(面试/截止/备考/其他),本次只改首页卡;如也要改成记事本式可再提。

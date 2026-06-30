@@ -147,48 +147,148 @@ function loadTimeline(): Timeline {
 }
 
 // ===== 新功能公告 Modal =====
-function NewFeatureModal({ onClose }: { onClose: () => void }) {
+// ===== 首次打开引导弹窗(3 页轮播) =====
+// 三页示意图:高仿真复刻真实界面布局,内容用真实示例并隐去关键信息
+
+function RewriteMock() {
+  const hl = "bg-yellow-100 text-yellow-900 rounded px-0.5"
+  return (
+    <div className="h-full flex flex-col text-[11px] leading-relaxed">
+      <div className="grid grid-cols-2 gap-2 flex-1 min-h-0">
+        {/* 原文 */}
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] overflow-hidden flex flex-col">
+          <div className="px-2.5 py-1.5 bg-[var(--surface2)] border-b border-[var(--border)] text-[10px] font-semibold text-[var(--text-muted)]">原文</div>
+          <div className="p-2.5 text-[var(--text-sub)] space-y-1 overflow-hidden">
+            <p className="font-semibold text-[var(--text-main)]">某规划设计院 · 实习生</p>
+            <p>完成地块控规图纸与图则修改，独立承担城市设计辅助工作</p>
+          </div>
+        </div>
+        {/* 改写后 */}
+        <div className="rounded-lg border border-[var(--primary)]/30 bg-[#FFFDF9] overflow-hidden flex flex-col">
+          <div className="px-2.5 py-1.5 bg-[var(--primary-bg)] border-b border-[var(--primary)]/20 text-[10px] font-semibold text-[var(--primary)]">改写后</div>
+          <div className="p-2.5 text-[var(--text-main)] space-y-1 overflow-hidden">
+            <p className="font-semibold">某规划设计院 · <mark className={hl}>产品实习</mark></p>
+            <p><mark className={hl}>主导 7 个</mark>地块方案的<mark className={hl}>需求梳理与交付</mark>，独立负责核心模块设计</p>
+          </div>
+        </div>
+      </div>
+      <p className="mt-2 text-[10px] text-[var(--text-muted)] text-center">黄色高亮 = AI 新增 / 强化的表达 · 关键信息已隐去</p>
+    </div>
+  )
+}
+
+function InterviewerMock() {
+  const items = [
+    { s: "命中", txt: "需求分析与方案落地", cls: "bg-green-50 text-green-700 border-green-200", dot: "bg-green-500" },
+    { s: "较弱", txt: "数据驱动决策",       cls: "bg-amber-50 text-amber-700 border-amber-200", dot: "bg-amber-500" },
+    { s: "缺失", txt: "AB 实验经验",         cls: "bg-red-50 text-red-700 border-red-200",     dot: "bg-red-500" },
+  ]
+  return (
+    <div className="h-full flex flex-col text-[11px] gap-2">
+      <div className="flex items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2.5">
+        <div className="text-2xl font-bold text-amber-600 leading-none shrink-0">78<span className="text-xs text-[var(--text-muted)] font-normal">/100</span></div>
+        <p className="text-[var(--text-sub)] flex-1 leading-snug">产品思维与项目落地能力突出，<span className="text-[var(--text-main)] font-medium">数据分析经验需补强</span></p>
+      </div>
+      <div className="grid grid-cols-3 gap-1.5">
+        {items.map(it => (
+          <div key={it.s} className={`rounded-lg border px-2 py-1.5 ${it.cls}`}>
+            <div className="flex items-center gap-1 mb-0.5"><span className={`w-1.5 h-1.5 rounded-full ${it.dot}`} /><span className="font-semibold text-[10px]">{it.s}</span></div>
+            <p className="text-[10px] leading-tight">{it.txt}</p>
+          </div>
+        ))}
+      </div>
+      <div className="rounded-lg bg-[var(--surface2)] border border-[var(--border)] p-2.5">
+        <p className="text-[10px] text-[var(--text-muted)] mb-0.5">⚠ 面试官可能追问</p>
+        <p className="text-[var(--text-main)] leading-snug">简历写「独立负责」→ <span className="font-medium">具体你主导了哪些关键决策？</span></p>
+      </div>
+    </div>
+  )
+}
+
+function JdAnalysisMock() {
+  const ring = 72
+  const items = [
+    { s: "匹配",   txt: "用户研究",       cls: "text-green-700 bg-green-50 border-green-200", dot: "bg-green-500" },
+    { s: "需强化", txt: "增长策略",       cls: "text-amber-700 bg-amber-50 border-amber-200", dot: "bg-amber-500" },
+    { s: "缺失",   txt: "AIGC 产品应用",  cls: "text-red-700 bg-red-50 border-red-200",       dot: "bg-red-500" },
+  ]
+  return (
+    <div className="h-full flex flex-col text-[11px] gap-2">
+      <div className="flex items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2.5">
+        <svg width="52" height="52" viewBox="0 0 36 36" className="shrink-0">
+          <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#EDE7DC" strokeWidth="3.5" />
+          <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#F59E0B" strokeWidth="3.5" strokeLinecap="round" strokeDasharray={`${ring} 100`} transform="rotate(-90 18 18)" />
+          <text x="18" y="21" textAnchor="middle" fill="#2E5B54" fontSize="10" fontWeight="700">{ring}</text>
+        </svg>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-[var(--text-main)] leading-snug">某互联网大厂 · 策略产品经理 <span className="ml-1 text-[10px] font-medium text-amber-700 bg-amber-100 rounded px-1.5 py-0.5">中等匹配</span></p>
+          <p className="text-[var(--text-sub)] mt-0.5 text-[10px]">产品基础扎实，建议补充 AIGC 相关实践</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-1.5">
+        {items.map(it => (
+          <div key={it.s} className={`rounded-lg border px-2 py-1.5 ${it.cls}`}>
+            <div className="flex items-center gap-1 mb-0.5"><span className={`w-1.5 h-1.5 rounded-full ${it.dot}`} /><span className="font-semibold text-[10px]">{it.s}</span></div>
+            <p className="text-[10px] leading-tight">{it.txt}</p>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+        <div className="rounded-lg border border-red-200 bg-red-50/50 p-2">
+          <p className="font-semibold text-red-700 mb-0.5">必须补充</p>
+          <p className="text-[var(--text-sub)]">! AIGC 产品案例</p>
+        </div>
+        <div className="rounded-lg border border-green-200 bg-green-50/50 p-2">
+          <p className="font-semibold text-green-700 mb-0.5">可突出</p>
+          <p className="text-[var(--text-sub)]">★ 跨学科研究能力</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function OnboardingGuideModal({ onClose }: { onClose: () => void }) {
+  const [step, setStep] = useState(0)
+  const STEPS = [
+    { title: "① 简历改写",       subtitle: "对着目标 JD，把你的经历改写成岗位想看的样子",          mock: <RewriteMock /> },
+    { title: "② 面试官视角分析", subtitle: "AI 以面试官视角给简历打分，点出命中、薄弱与会被追问处", mock: <InterviewerMock /> },
+    { title: "③ JD 分析",        subtitle: "粘贴岗位 JD，逐项看清匹配度、必须补充与可突出的亮点",    mock: <JdAnalysisMock /> },
+  ]
+  const isLast = step === STEPS.length - 1
+  const cur = STEPS[step]
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="bg-[var(--surface)] rounded-xl shadow-2xl max-w-sm w-full overflow-hidden" onClick={e => e.stopPropagation()}>
-        <div className="bg-[var(--primary-bg)] border-b border-[var(--primary)]/20 px-5 py-4 flex items-center justify-between">
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
+        <button onClick={onClose} className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-main)] text-base leading-none">×</button>
+        {/* 进度条 */}
+        <div className="flex gap-1.5 mb-4 pr-6">
+          {STEPS.map((_, i) => (
+            <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? "bg-[var(--primary)]" : "bg-[var(--border)]"}`} />
+          ))}
+        </div>
+        <p className="text-xs text-[var(--primary)] font-semibold mb-1">开始前，先认识 3 个核心功能</p>
+        <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">{cur.title}</h3>
+        <p className="text-xs text-[var(--text-muted)] mt-0.5 mb-3">{cur.subtitle}</p>
+        {/* 示意图区(固定高度,保证三页同尺寸) */}
+        <div className="h-[212px] rounded-xl border border-[var(--border)] bg-[var(--surface2)]/40 p-3 mb-4">
+          {cur.mock}
+        </div>
+        {/* 按钮区 */}
+        <div className="flex items-center justify-between gap-3">
+          <button onClick={onClose} className="text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">跳过</button>
           <div className="flex items-center gap-2">
-            <span className="text-base">✨</span>
-            <span className="text-sm font-semibold text-[var(--primary)]">新功能上线</span>
+            {step > 0 && (
+              <button onClick={() => setStep(s => s - 1)}
+                className="px-4 py-2 rounded-lg border border-[var(--border)] text-xs font-medium text-[var(--text-sub)] hover:bg-[var(--surface2)] transition-colors">上一步</button>
+            )}
+            {isLast ? (
+              <Link href="/resume" onClick={onClose}
+                className="px-5 py-2 rounded-lg bg-[var(--primary)] text-white text-xs font-semibold hover:opacity-90 transition-opacity">立即开始 →</Link>
+            ) : (
+              <button onClick={() => setStep(s => s + 1)}
+                className="px-5 py-2 rounded-lg bg-[var(--primary)] text-white text-xs font-semibold hover:opacity-90 transition-opacity">下一步</button>
+            )}
           </div>
-          <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-main)] text-base leading-none transition-colors">×</button>
-        </div>
-        <div className="px-5 py-4 space-y-3">
-          <div className="flex items-start gap-3">
-            <span className="text-base shrink-0">🤖</span>
-            <div>
-              <p className="text-xs font-semibold text-[var(--text-main)] mb-0.5">AI 现在认识你了</p>
-              <p className="text-xs text-[var(--text-muted)]">对话自动读取求职进度，给出针对性建议</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-base shrink-0">📄</span>
-            <div>
-              <p className="text-xs font-semibold text-[var(--text-main)] mb-0.5">简历一键导出 PDF</p>
-              <p className="text-xs text-[var(--text-muted)]">改写完成后可直接导出 PDF 投递</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-base shrink-0">📅</span>
-            <div>
-              <p className="text-xs font-semibold text-[var(--text-main)] mb-0.5">日程自动同步</p>
-              <p className="text-xs text-[var(--text-muted)]">投递看板新增面试时间和截止日期，自动同步到首页日程</p>
-            </div>
-          </div>
-        </div>
-        <div className="px-5 pb-5 flex items-center justify-between">
-          <Link href="/onboarding" onClick={onClose} className="text-xs text-[var(--primary)] hover:underline font-semibold">
-            查看功能导览 →
-          </Link>
-          <button onClick={onClose}
-            className="px-4 py-2 bg-[var(--primary)] text-white text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity">
-            我知道了
-          </button>
         </div>
       </div>
     </div>
@@ -957,9 +1057,9 @@ export default function HomePage() {
   const [showTimelineSettings, setShowTimelineSettings] = useState(false)
   const [showAddEvent, setShowAddEvent]                 = useState(false)
   const [addEventDate, setAddEventDate]                 = useState("")
-  const [showNewFeature, setShowNewFeature] = useState(() => {
+  const [showGuide, setShowGuide] = useState(() => {
     if (typeof window === "undefined") return false
-    return localStorage.getItem("jobpilot_nf_v2_dismissed") !== "1"
+    return localStorage.getItem("jobpilot_onboarding_v1_done") !== "1"
   })
   const [timeline, setTimeline]             = useState<Timeline>(loadTimeline)
   const [activeReminders, setActiveReminders] = useState<ActiveReminder[]>([])
@@ -971,9 +1071,9 @@ export default function HomePage() {
   const [showAllMine, setShowAllMine] = useState(false)
   const [showAllJd, setShowAllJd]     = useState(false)
 
-  const dismissNewFeature = () => {
-    localStorage.setItem("jobpilot_nf_v2_dismissed", "1")
-    setShowNewFeature(false)
+  const dismissGuide = () => {
+    localStorage.setItem("jobpilot_onboarding_v1_done", "1")
+    setShowGuide(false)
   }
 
   const openAddEvent = (date: string) => {
@@ -1434,7 +1534,7 @@ export default function HomePage() {
 
       {/* ── Modals ── */}
       {showIntentPanel      && <IntentTagPanel onClose={() => setShowIntentPanel(false)} />}
-      {showNewFeature        && <NewFeatureModal onClose={dismissNewFeature} />}
+      {showGuide             && <OnboardingGuideModal onClose={dismissGuide} />}
       {showTimelineSettings  && <TimelineSettingsModal timeline={timeline} onSave={saveTimeline} onClose={() => setShowTimelineSettings(false)} />}
       {showAddEvent          && <AddEventModal defaultDate={addEventDate} onSave={handleAddEvent} onClose={() => setShowAddEvent(false)} />}
     </div>
