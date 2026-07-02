@@ -27,6 +27,33 @@ const DOMAIN_ORDER = ["direction", "method", "domain", "tooling", "soft"]
 type SketchTone = "green" | "ochre" | "terra" | "muted"
 type SketchPose = "point" | "read" | "carry" | "mark"
 
+function LayerBadgeIcon({ tone = "green", label = "" }: { tone?: SketchTone; label?: string }) {
+  const accent = tone === "ochre" ? "#C0954E" : tone === "terra" ? "#B6634A" : tone === "muted" ? "#9C8B70" : "#2E5B54"
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+      <rect x="6" y="5" width="13.5" height="17" rx="2.2" fill="white" stroke="#102F59" strokeWidth="1.25" opacity="0.96" />
+      <path d="M9 10h6.5M9 13.4h8M9 16.8h4.5" stroke="#102F59" strokeWidth="1.15" strokeLinecap="round" opacity="0.76" />
+      <path d="M17.5 8.5h4.2v4.2" stroke={accent} strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15.5 14.5l6.2-6" stroke={accent} strokeWidth="1.55" strokeLinecap="round" />
+      <circle cx="20.9" cy="19.4" r="2.25" fill={accent} />
+      {label && <text x="20.9" y="20.55" textAnchor="middle" fontSize="3.8" fontWeight="700" fill="white">{label.slice(0, 1)}</text>}
+    </svg>
+  )
+}
+
+function BlueprintStage({ index, title, sub, done }: { index: string; title: string; sub: string; done: boolean }) {
+  return (
+    <div className={`relative rounded-xl border px-3 py-2 ${done ? "border-[var(--accent)] bg-white/14" : "border-white/22 bg-white/7"}`}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/55">{index}</span>
+        <span className={`h-1.5 w-1.5 rounded-full ${done ? "bg-[var(--accent)]" : "bg-white/30"}`} />
+      </div>
+      <p className="mt-1 text-xs font-semibold text-white">{title}</p>
+      <p className="mt-0.5 text-[10px] leading-4 text-white/58">{sub}</p>
+    </div>
+  )
+}
+
 function PlanPersonIcon({ tone = "green", pose = "point" }: { tone?: SketchTone; pose?: SketchPose }) {
   const accent = tone === "ochre" ? "#C0954E" : tone === "terra" ? "#B6634A" : tone === "muted" ? "#9C8B70" : "#2E5B54"
   const navy = "#102F59"
@@ -1239,6 +1266,10 @@ export default function HomePage() {
 
   const todayLabel = new Date().toLocaleDateString("zh-CN", { month: "long", day: "numeric", weekday: "long" })
   const hasData    = allApps.length > 0
+  const hasBaseResume = resumeVersions.length > 0 || myTags.length > 0
+  const hasMyAbilityLayer = myTags.length > 0
+  const hasJdRequirementLayer = jdTags.length > 0
+  const hasMatchedVersion = resumeVersions.length > 0 && jdTags.length > 0
 
   // 求职小猫成长阶段
   const catStage = useMemo((): number => {
@@ -1274,22 +1305,28 @@ export default function HomePage() {
         {/* ===== 中栏:主内容(压缩) ===== */}
         <div className="flex-1 min-w-0">
 
-      {/* ── 多 JD 简历适配入口 ── */}
-      <h2 className="text-xl font-bold text-[var(--text-main)] font-cartoon mb-2">JD 简历适配台</h2>
-      <div className="mb-4 rounded-2xl overflow-hidden relative bg-[var(--hero)] text-white px-6 py-6">
-        <div className="absolute right-5 top-5 hidden sm:grid grid-cols-2 gap-2 opacity-25">
-          {['基础简历', '目标 JD', '能力标签', '定制版本'].map(t => (
-            <span key={t} className="rounded-xl border border-white/40 px-3 py-2 text-[10px] font-semibold text-white">{t}</span>
-          ))}
-        </div>
-        <div className="relative max-w-md">
-          <p className="text-base text-white/90 leading-relaxed mb-5">
-            面向转行新人：用一份基础简历快速匹配多个 JD，拆出岗位要求、能力缺口和最该突出的经历。
-          </p>
-          <Link href="/resume"
-            className="inline-flex items-center gap-1 bg-[var(--accent)] text-[var(--hero)] px-4 py-2 rounded-lg text-xs font-semibold hover:brightness-95 transition-all">
-            {resumeVersions.length > 0 ? "继续适配新的 JD" : "建立基础简历"} →
-          </Link>
+      {/* ── 简历适配蓝图入口 ── */}
+      <h2 className="text-xl font-bold text-[var(--text-main)] font-cartoon mb-2">简历适配蓝图</h2>
+      <div className="mb-4 rounded-2xl overflow-hidden relative bg-[var(--hero)] text-white px-6 py-5">
+        <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
+          style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "22px 22px" }} />
+        <div className="relative grid gap-4 lg:grid-cols-[1.05fr_1.2fr] lg:items-center">
+          <div>
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">Resume Adaptation Blueprint</p>
+            <p className="text-base text-white/90 leading-relaxed mb-4">
+              把一份基础简历当作底图，先提取你的能力图层，再读取目标 JD 的约束图层，最后生成这一岗位该强调、该补齐、该重写的版本。
+            </p>
+            <Link href="/resume"
+              className="inline-flex items-center gap-1 bg-[var(--accent)] text-[var(--hero)] px-4 py-2 rounded-lg text-xs font-semibold hover:brightness-95 transition-all">
+              {hasJdRequirementLayer ? "继续匹配修改" : hasBaseResume ? "导入目标 JD" : "建立基础简历底图"} →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <BlueprintStage index="01" title="基础简历底图" sub="收集经历、项目、技能" done={hasBaseResume} />
+            <BlueprintStage index="02" title="我的能力图层" sub="从素材中抽能力标签" done={hasMyAbilityLayer} />
+            <BlueprintStage index="03" title="JD 约束图层" sub="拆岗位要求与优先级" done={hasJdRequirementLayer} />
+            <BlueprintStage index="04" title="匹配修改方案" sub="生成定制投递版本" done={hasMatchedVersion} />
+          </div>
         </div>
       </div>
 
@@ -1310,14 +1347,14 @@ export default function HomePage() {
         const jdShown   = showAllJd   ? sortedJd   : sortedJd.slice(0, LIMIT)
         const jdMat = (t: JdTag) => matHref(matchMyTags.find(m => m.id === t.id)?.materials)
 
-        // 单行卡片(规划图式小人 + 标题/副标题 + 右侧药丸)
-        const Row = ({ href, icon, iconBg, tone, pose, title, subtitle, pill, pillCls }: {
-          href: string; icon: string; iconBg: string; tone: SketchTone; pose: SketchPose
+        // 单行卡片(图层/约束符号 + 标题/副标题 + 右侧状态)
+        const Row = ({ href, icon, iconBg, tone, title, subtitle, pill, pillCls }: {
+          href: string; icon: string; iconBg: string; tone: SketchTone
           title: string; subtitle: string; pill: string; pillCls: string
         }) => (
           <Link href={href}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--surface2)] transition-colors">
-            <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`} title={icon}><PlanPersonIcon tone={tone} pose={pose} /></span>
+            <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`} title={icon}><LayerBadgeIcon tone={tone} label={icon} /></span>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[var(--text-main)] truncate">{title}</p>
               <p className="text-xs text-[var(--text-muted)] truncate">{subtitle}</p>
@@ -1329,8 +1366,8 @@ export default function HomePage() {
         return (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">能力匹配面板</h3>
-              <Link href="/resume" className="text-xs text-[var(--primary)] hover:underline">换一个 JD →</Link>
+              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">能力图层 × JD 约束</h3>
+              <Link href="/resume" className="text-xs text-[var(--primary)] hover:underline">进入匹配修改 →</Link>
             </div>
             <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 lg:h-[260px] flex flex-col">
               <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-[var(--border)] flex-1 min-h-0 overflow-y-auto">
@@ -1338,7 +1375,7 @@ export default function HomePage() {
                 <div className="sm:pr-4">
                   <div className="flex items-center justify-between mb-1.5 px-1">
                     <p className="text-xs font-semibold text-[var(--text-sub)]">
-                      我的能力标签 <span className="text-[var(--text-muted)] font-normal">· 来自素材库</span>
+                      基础简历能力图层 <span className="text-[var(--text-muted)] font-normal">· 来自素材库</span>
                     </p>
                     <button onClick={refreshMyTags} disabled={capLoading}
                       className="text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] disabled:opacity-50"
@@ -1355,13 +1392,12 @@ export default function HomePage() {
                       {mineShown.map(t => {
                         const st = DOMAIN_STYLE[t.domain]
                         const tone = t.domain === "domain" ? "ochre" : t.domain === "soft" ? "muted" : "green"
-                        const pose: SketchPose = t.domain === "method" ? "mark" : t.domain === "tooling" ? "carry" : t.domain === "soft" ? "point" : "read"
                         const sub = t.materials.length
                           ? `${st.name}${t.strength === "弱" ? " · 待强化" : ""} · ${t.materials.length} 段经历`
                           : `${st.name} · 通用素养`
                         return (
                           <Row key={t.id} href={matHref(t.materials)} icon={t.label[0]} iconBg={st.icon}
-                            tone={tone} pose={pose} title={t.label} subtitle={sub} pill="查看经历" pillCls={st.pill} />
+                            tone={tone} title={t.label} subtitle={sub} pill="查看经历" pillCls={st.pill} />
                         )
                       })}
                       {sortedMine.length > LIMIT && (
@@ -1376,7 +1412,7 @@ export default function HomePage() {
                 {/* 右:所需能力 */}
                 <div className="sm:pl-4 mt-4 pt-4 sm:mt-0 sm:pt-0 border-t sm:border-t-0 border-[var(--border)]">
                   <p className="text-xs font-semibold text-[var(--text-sub)] mb-1.5 px-1">
-                    岗位要求标签 <span className="text-[var(--text-muted)] font-normal">· 最近分析的 JD</span>
+                    目标 JD 约束图层 <span className="text-[var(--text-muted)] font-normal">· 最近分析的 JD</span>
                   </p>
                   {sortedJd.length === 0 ? (
                     <p className="text-xs text-[var(--text-muted)] px-1 py-2">
@@ -1387,11 +1423,10 @@ export default function HomePage() {
                       {jdShown.map(t => {
                         const st = STATUS_STYLE[t.status]
                         const tone: SketchTone = t.status === "缺口" ? "terra" : t.status === "部分" ? "ochre" : "green"
-                        const pose: SketchPose = t.status === "缺口" ? "point" : t.status === "部分" ? "read" : "mark"
                         return (
                           <Row key={t.id} href={jdMat(t)} icon={t.label[0]} iconBg={st.icon}
                             title={t.label} subtitle={`${t.priority} · ${DOMAIN_STYLE[t.domain].name}`}
-                            tone={tone} pose={pose} pill={st.label} pillCls={st.pill} />
+                            tone={tone} pill={st.label} pillCls={st.pill} />
                         )
                       })}
                       {sortedJd.length > LIMIT && (
