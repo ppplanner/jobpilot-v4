@@ -1337,27 +1337,25 @@ export default function HomePage() {
 
       {/* ── 简历适配蓝图入口 ── */}
       <h2 className="text-xl font-bold text-[var(--text-main)] font-cartoon mb-2">简历适配蓝图</h2>
-      <div className="mb-4 rounded-2xl overflow-hidden relative bg-[var(--hero)] text-white px-6 py-5">
+      <div className="mb-4 rounded-2xl overflow-hidden relative bg-[var(--hero)] text-white px-6 py-6">
         <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
           style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "22px 22px" }} />
-        <span className="pointer-events-none absolute right-4 top-3 font-mono text-[10px] tracking-[0.2em] text-white/45">R-01</span>
-        <div className="relative grid gap-4 lg:grid-cols-[1.05fr_1.2fr] lg:items-center">
-          <div>
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">Resume Adaptation Blueprint</p>
-            <p className="text-base text-white/90 leading-relaxed mb-4">
-              把一份基础简历当作底图，先提取你的能力图层，再读取目标 JD 的约束图层，最后生成这一岗位该强调、该补齐、该重写的版本。
-            </p>
-            <Link href="/resume"
-              className="inline-flex items-center gap-1 bg-[var(--accent)] text-[var(--hero)] px-4 py-2 rounded-lg text-xs font-semibold hover:brightness-95 transition-all">
-              {hasJdRequirementLayer ? "继续匹配修改" : hasBaseResume ? "导入目标 JD" : "建立基础简历底图"} →
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <BlueprintStage index="01" title="基础简历底图" sub="收集经历、项目、技能" done={hasBaseResume} />
-            <BlueprintStage index="02" title="我的能力图层" sub="从素材中抽能力标签" done={hasMyAbilityLayer} />
-            <BlueprintStage index="03" title="JD 约束图层" sub="拆岗位要求与优先级" done={hasJdRequirementLayer} />
-            <BlueprintStage index="04" title="匹配修改方案" sub="生成定制投递版本" done={hasMatchedVersion} />
-          </div>
+        {/* 淡描边概念标签(装饰,非进度条) */}
+        <div className="pointer-events-none absolute right-5 top-5 hidden sm:grid grid-cols-2 gap-2 opacity-25">
+          {["基础简历底图", "能力图层", "JD 约束层", "定制版本"].map(t => (
+            <span key={t} className="rounded-xl border border-white/40 px-3 py-2 text-[10px] font-semibold text-white">{t}</span>
+          ))}
+        </div>
+        <span className="pointer-events-none absolute right-4 bottom-3 font-mono text-[10px] tracking-[0.2em] text-white/40">R-01</span>
+        <div className="relative max-w-md">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">Resume Adaptation Blueprint</p>
+          <p className="text-base text-white/90 leading-relaxed mb-5">
+            把一份基础简历当作底图，叠上你的能力与目标 JD 的要求，生成这一岗位该强调、该补齐、该重写的版本。
+          </p>
+          <Link href="/resume"
+            className="inline-flex items-center gap-1 bg-[var(--accent)] text-[var(--hero)] px-4 py-2 rounded-lg text-xs font-semibold hover:brightness-95 transition-all">
+            {hasJdRequirementLayer ? "继续匹配修改" : hasBaseResume ? "导入目标 JD" : "建立基础简历底图"} →
+          </Link>
         </div>
       </div>
 
@@ -1584,32 +1582,6 @@ export default function HomePage() {
               <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">求职日历</h3>
             </div>
             <HomeCalendar events={customEvents} onAdd={(date, title) => handleAddEvent({ date, title, type: "日程", time: "" })} onDelete={handleDeleteCustomEvent} />
-          </div>
-          <div className="lg:flex-1">
-            <div className="flex items-baseline gap-2 mb-2">
-              <SheetCode>R-05 / PATH</SheetCode>
-              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">求职路径</h3>
-            </div>
-            <div className="relative bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 h-full overflow-hidden">
-              <div className="pointer-events-none absolute inset-0" style={SHEET_GRID} />
-              <SheetCorners />
-            <div className="relative space-y-3.5">
-              {[
-                { label: "简历改写", value: resumeVersions.length, unit: "份" },
-                { label: "累计投递", value: allApps.length, unit: "家" },
-                { label: "待面试",   value: allApps.filter((a: any) => ["一面", "二面", "HR面"].includes(a.status)).length, unit: "家" },
-                { label: "收到 Offer", value: allApps.filter((a: any) => a.status === "Offer").length, unit: "个" },
-              ].map(s => (
-                <div key={s.label} className="flex items-center justify-between">
-                  <span className="text-sm text-[var(--text-sub)]">{s.label}</span>
-                  <span>
-                    <span className="text-base font-semibold text-[var(--text-main)]">{s.value}</span>
-                    <span className="text-xs text-[var(--text-muted)] ml-0.5">{s.unit}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
           </div>
         </aside>
       </div>{/* ===== flex 结束 ===== */}
