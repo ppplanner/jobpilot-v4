@@ -36,6 +36,9 @@
 
 ## 改动日志
 
+### 2026-07-03
+- **首页「蓝图皮肤」reskin(只换皮肤,不动结构/功能)**:在 `frontend/app/page.tsx` 叠加一层建筑制图质感,主色卡(墨绿/薄荷/米杏)与三栏布局全部保持不变。新增三个轻量皮肤件:`SHEET_GRID`(淡墨绿内联网格底纹,不改全局 `globals.css`)、`SheetCorners`(卡片四角 L 形描线角标,需放进 `relative` 容器)、`SheetCode`(等宽字图纸编号小标)。应用点:页面外层加网格底纹;Hero 右上角 `R-01`;能力图层卡 `R-02 / LAYERS` + 角标 + 网格;历史简历 `R-03 / VERSIONS`;求职日历卡角标 + `R-04 / CALENDAR`;求职路径卡 `R-05 / PATH` + 角标 + 网格。注意:加了网格/角标(absolute)的卡片,其内容 wrapper 需补 `relative` 以盖在网格之上(能力卡内层 grid、求职路径 `space-y-3.5` 已补)。范围仅首页,其他页未动(用户选择:先在首页立住风格)。`tsc --noEmit` 通过,Playwright 截图确认渲染正常。分支 `redesign/blueprint-skin`,未合回 main。**决策背景**:用户觉得原首页"成套仪表盘、没自己特点";定的方向是「蓝图叠图」隐喻(贴合其城乡规划转行背景),但本轮只做低风险换皮肤,暂不做结构性叙事改造。
+
 ### 2026-06-30
 - **首次打开引导弹窗(3 页轮播)替换「新功能上线」弹窗**:`page.tsx` 新增 `OnboardingGuideModal` + 三个高仿真示意图子组件 `RewriteMock`/`InterviewerMock`/`JdAnalysisMock`,用代码复刻三大核心功能的真实界面布局(① 简历改写双栏对比+黄色高亮新增词;② 面试官视角分析:总分78+命中/较弱/缺失矩阵+追问预警;③ JD分析:圆形评分环72+逐项匹配+必须补充/可突出)。内容用真实示例(城乡规划转PM)并隐去关键信息(院校/地名→「某规划设计院」「某互联网大厂」)。第 1、2 页按钮「跳过\|下一步」,**第 3 页变「立即开始 →」**(`<Link href="/resume" onClick={onClose}>`)跳简历工作台。首屏触发改用新 key `jobpilot_onboarding_v1_done`(原 `showNewFeature`/`jobpilot_nf_v2_dismissed`/`NewFeatureModal` 已移除,`/onboarding` 独立导览页保留)。示意图为代码复刻非截图(轻量、随主题、不随UI改版过期)。Playwright 实测:三页切换、进度条、立即开始跳转/resume+标记已读+刷新不再弹,全部通过。
 

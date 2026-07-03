@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, type ReactNode } from "react"
 import Link from "next/link"
 import { useProfile } from "@/lib/useProfile"
 import { api, CalendarEvent, CustomCalendarEvent, ResumeVersion, MyTag, JdTag } from "@/lib/api"
@@ -23,6 +23,35 @@ const STATUS_STYLE: Record<string, { icon: string; pill: string; label: string }
   缺口: { icon: "bg-[#B6634A]", pill: "bg-[#F1E0DA] text-[#9E4631]", label: "缺口" },
 }
 const DOMAIN_ORDER = ["direction", "method", "domain", "tooling", "soft"]
+
+// ===== 蓝图皮肤(只换皮肤:保留墨绿主色,叠加图纸/描图纸质感) =====
+// 淡墨绿网格底纹(描图纸感)——用内联样式,不动全局 globals.css
+const SHEET_GRID = {
+  backgroundImage:
+    "linear-gradient(to right, rgba(46,91,84,0.05) 1px, transparent 1px)," +
+    "linear-gradient(to bottom, rgba(46,91,84,0.05) 1px, transparent 1px)",
+  backgroundSize: "24px 24px",
+}
+// 图纸四角角标(L 形描线),需放进 position:relative 的容器
+function SheetCorners() {
+  const base = "pointer-events-none absolute w-2.5 h-2.5 border-[var(--primary)]/25"
+  return (
+    <>
+      <span className={`${base} left-2 top-2 border-l border-t`} />
+      <span className={`${base} right-2 top-2 border-r border-t`} />
+      <span className={`${base} left-2 bottom-2 border-l border-b`} />
+      <span className={`${base} right-2 bottom-2 border-r border-b`} />
+    </>
+  )
+}
+// 图纸编号小标(等宽字,drafting caption)
+function SheetCode({ children }: { children: ReactNode }) {
+  return (
+    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+      {children}
+    </span>
+  )
+}
 
 type SketchTone = "green" | "ochre" | "terra" | "muted"
 type SketchPose = "point" | "read" | "carry" | "mark"
@@ -1005,7 +1034,8 @@ function HomeCalendar({ events, onAdd, onDelete }: {
   }
 
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
+    <div className="relative bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
+      <SheetCorners />
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-semibold text-[var(--text-main)]">{vy}年{m1}月</span>
         <div className="flex gap-1">
@@ -1300,7 +1330,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8" style={SHEET_GRID}>
       <div className="flex flex-col lg:flex-row gap-6">
         {/* ===== 中栏:主内容(压缩) ===== */}
         <div className="flex-1 min-w-0">
@@ -1310,6 +1340,7 @@ export default function HomePage() {
       <div className="mb-4 rounded-2xl overflow-hidden relative bg-[var(--hero)] text-white px-6 py-5">
         <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
           style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "22px 22px" }} />
+        <span className="pointer-events-none absolute right-4 top-3 font-mono text-[10px] tracking-[0.2em] text-white/45">R-01</span>
         <div className="relative grid gap-4 lg:grid-cols-[1.05fr_1.2fr] lg:items-center">
           <div>
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">Resume Adaptation Blueprint</p>
@@ -1366,11 +1397,16 @@ export default function HomePage() {
         return (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">能力图层 × JD 约束</h3>
+              <div className="flex items-baseline gap-2">
+                <SheetCode>R-02 / LAYERS</SheetCode>
+                <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">能力图层 × JD 约束</h3>
+              </div>
               <Link href="/resume" className="text-xs text-[var(--primary)] hover:underline">进入匹配修改 →</Link>
             </div>
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 lg:h-[260px] flex flex-col">
-              <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-[var(--border)] flex-1 min-h-0 overflow-y-auto">
+            <div className="relative bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 lg:h-[260px] flex flex-col overflow-hidden">
+              <div className="pointer-events-none absolute inset-0" style={SHEET_GRID} />
+              <SheetCorners />
+              <div className="relative grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-[var(--border)] flex-1 min-h-0 overflow-y-auto">
                 {/* 左:个人能力 */}
                 <div className="sm:pr-4">
                   <div className="flex items-center justify-between mb-1.5 px-1">
@@ -1481,7 +1517,10 @@ export default function HomePage() {
       {loaded && (
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">历史简历版本</h3>
+            <div className="flex items-baseline gap-2">
+              <SheetCode>R-03 / VERSIONS</SheetCode>
+              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">历史简历版本</h3>
+            </div>
             <Link href="/resume" className="text-xs text-[var(--primary)] hover:underline">全部 →</Link>
           </div>
           {resumeVersions.length > 0 ? (
@@ -1540,13 +1579,21 @@ export default function HomePage() {
         {/* ===== 右栏:日历系统(贯穿整个右侧) ===== */}
         <aside className="lg:w-80 shrink-0 flex flex-col gap-4">
           <div>
-            <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon mb-2">求职日历</h3>
+            <div className="flex items-baseline gap-2 mb-2">
+              <SheetCode>R-04 / CALENDAR</SheetCode>
+              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">求职日历</h3>
+            </div>
             <HomeCalendar events={customEvents} onAdd={(date, title) => handleAddEvent({ date, title, type: "日程", time: "" })} onDelete={handleDeleteCustomEvent} />
           </div>
           <div className="lg:flex-1">
-            <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon mb-2">求职路径</h3>
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 h-full">
-            <div className="space-y-3.5">
+            <div className="flex items-baseline gap-2 mb-2">
+              <SheetCode>R-05 / PATH</SheetCode>
+              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">求职路径</h3>
+            </div>
+            <div className="relative bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 h-full overflow-hidden">
+              <div className="pointer-events-none absolute inset-0" style={SHEET_GRID} />
+              <SheetCorners />
+            <div className="relative space-y-3.5">
               {[
                 { label: "简历改写", value: resumeVersions.length, unit: "份" },
                 { label: "累计投递", value: allApps.length, unit: "家" },
