@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import { SHEET_GRID } from "@/components/blueprint"
 
 const BASE_URL = ""
 
@@ -67,8 +68,9 @@ export default function SettingsPage() {
   )
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-12">
-      <h1 className="text-xl font-bold text-[var(--text-main)] mb-1">API 设置</h1>
+    <div className="max-w-lg mx-auto px-4 py-12" style={SHEET_GRID}>
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-0.5">Settings</p>
+      <h1 className="text-xl font-bold text-[var(--text-main)] font-cartoon mb-1">API 设置</h1>
       <p className="text-sm text-[var(--text-muted)] mb-8">配置 LLM API Key，AI 功能才能正常工作</p>
 
       {message && (

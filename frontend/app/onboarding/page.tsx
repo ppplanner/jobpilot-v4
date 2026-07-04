@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { SHEET_GRID } from "@/components/blueprint"
 
 const STEPS = [
   {
@@ -280,13 +281,13 @@ export default function OnboardingPage() {
   const step = STEPS[activeStep]
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8" style={SHEET_GRID}>
       {/* 顶部标题 */}
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 bg-[var(--surface2)] border border-[var(--border)] rounded-full px-4 py-1.5 text-sm text-[var(--text-sub)] font-medium mb-4">
           功能导览
         </div>
-        <h1 className="text-2xl font-bold text-[var(--text-main)] mb-3">5 分钟了解 JobPilot</h1>
+        <h1 className="text-2xl font-bold text-[var(--text-main)] font-cartoon mb-3">5 分钟了解 JobPilot</h1>
         <p className="text-[var(--text-muted)] text-sm max-w-xl mx-auto">
           从简历上传到投递跟踪，8 个步骤带你走完完整的 AI 求职全流程
         </p>

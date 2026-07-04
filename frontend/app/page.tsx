@@ -1450,20 +1450,6 @@ export default function HomePage() {
         )
       })()}
 
-      {/* ── 提醒 ── */}
-      {activeReminders.map(r => (
-        <div key={r.key} className="mb-3 flex items-start gap-3 px-4 py-3 bg-[var(--surface2)] border border-[var(--border)] rounded-xl">
-          <span className="text-base shrink-0 mt-0.5">{r.icon}</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[var(--text-main)]">{r.message}</p>
-            {r.subtext && <p className="text-xs text-[var(--text-muted)] mt-0.5">{r.subtext}</p>}
-            {r.type === "inactivity" && <Link href="/tracker" className="text-xs text-[var(--primary)] hover:underline font-semibold mt-1 inline-block">去投递看板 →</Link>}
-            {r.type === "season" && <button onClick={() => setShowTimelineSettings(true)} className="text-xs text-[var(--primary)] hover:underline font-semibold mt-1">设置时间线 →</button>}
-          </div>
-          <button onClick={() => dismissReminder(r.key)} className="text-[var(--text-muted)] hover:text-[var(--text-main)] text-base leading-none shrink-0">×</button>
-        </div>
-      ))}
-
       {/* ── 面试提醒（下方）── */}
       {loaded && showPriorityCard && (
         <div className="mb-4 flex items-center gap-4 px-5 py-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden relative">
@@ -1555,6 +1541,30 @@ export default function HomePage() {
             </div>
             <HomeCalendar events={customEvents} onAdd={(date, title) => handleAddEvent({ date, title, type: "日程", time: "" })} onDelete={handleDeleteCustomEvent} />
           </div>
+
+          {/* ── 提醒(移到日历下方,与中栏历史简历齐平,平衡左右栏高度)── */}
+          {activeReminders.length > 0 && (
+            <div>
+              <div className="flex items-baseline gap-2 mb-2">
+                <SheetCode>R-05 / ALERTS</SheetCode>
+                <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">提醒</h3>
+              </div>
+              <div className="space-y-2">
+                {activeReminders.map(r => (
+                  <div key={r.key} className="flex items-start gap-3 px-4 py-3 bg-[var(--surface2)] border border-[var(--border)] rounded-xl">
+                    <span className="text-base shrink-0 mt-0.5">{r.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-[var(--text-main)]">{r.message}</p>
+                      {r.subtext && <p className="text-xs text-[var(--text-muted)] mt-0.5">{r.subtext}</p>}
+                      {r.type === "inactivity" && <Link href="/tracker" className="text-xs text-[var(--primary)] hover:underline font-semibold mt-1 inline-block">去投递看板 →</Link>}
+                      {r.type === "season" && <button onClick={() => setShowTimelineSettings(true)} className="text-xs text-[var(--primary)] hover:underline font-semibold mt-1">设置时间线 →</button>}
+                    </div>
+                    <button onClick={() => dismissReminder(r.key)} className="text-[var(--text-muted)] hover:text-[var(--text-main)] text-base leading-none shrink-0">×</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </aside>
       </div>{/* ===== flex 结束 ===== */}
 

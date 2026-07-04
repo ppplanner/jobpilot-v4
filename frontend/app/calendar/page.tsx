@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { api, CalendarEvent, CustomCalendarEvent } from "@/lib/api"
+import { SHEET_GRID } from "@/components/blueprint"
 
 const SEASONS = [
   { name: "秋招", start: [8, 1],  end: [10, 31], bg: "rgba(251,191,36,0.10)", accent: "#f59e0b" },
@@ -153,7 +154,9 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8" style={SHEET_GRID}>
+
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-2">Calendar</p>
 
       {/* ── 标题栏 ── */}
       <div className="flex items-center justify-between mb-6">
