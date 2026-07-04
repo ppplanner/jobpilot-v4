@@ -1383,9 +1383,17 @@ export default function HomePage() {
                     <p className="text-xs font-semibold text-[var(--text-sub)]">
                       基础简历能力图层 <span className="text-[var(--text-muted)] font-normal">· 来自素材库</span>
                     </p>
-                    <button onClick={refreshMyTags} disabled={capLoading}
-                      className="text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] disabled:opacity-50"
-                      title="重新聚合素材库">{capLoading ? "聚合中…" : "刷新"}</button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {sortedMine.length > LIMIT && (
+                        <button onClick={() => setShowAllMine(v => !v)}
+                          className="text-[10px] text-[var(--primary)] hover:underline">
+                          {showAllMine ? "收起" : `view all ${sortedMine.length}`}
+                        </button>
+                      )}
+                      <button onClick={refreshMyTags} disabled={capLoading}
+                        className="text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] disabled:opacity-50"
+                        title="重新聚合素材库">{capLoading ? "聚合中…" : "刷新"}</button>
+                    </div>
                   </div>
                   {sortedMine.length === 0 ? (
                     <p className="text-xs text-[var(--text-muted)] px-1 py-2">
@@ -1406,20 +1414,22 @@ export default function HomePage() {
                             tone={tone} title={t.label} subtitle={sub} pill="查看经历" pillCls={st.pill} />
                         )
                       })}
-                      {sortedMine.length > LIMIT && (
-                        <button onClick={() => setShowAllMine(v => !v)}
-                          className="mt-1.5 ml-1 text-xs text-[var(--primary)] hover:underline">
-                          {showAllMine ? "收起" : `view all (${sortedMine.length})`}
-                        </button>
-                      )}
                     </>
                   )}
                 </div>
                 {/* 右:所需能力 */}
                 <div className="sm:pl-4 mt-4 pt-4 sm:mt-0 sm:pt-0 border-t sm:border-t-0 border-[var(--border)]">
-                  <p className="text-xs font-semibold text-[var(--text-sub)] mb-1.5 px-1">
-                    目标 JD 约束图层 <span className="text-[var(--text-muted)] font-normal">· 最近分析的 JD</span>
-                  </p>
+                  <div className="flex items-center justify-between mb-1.5 px-1">
+                    <p className="text-xs font-semibold text-[var(--text-sub)]">
+                      目标 JD 约束图层 <span className="text-[var(--text-muted)] font-normal">· 最近分析的 JD</span>
+                    </p>
+                    {sortedJd.length > LIMIT && (
+                      <button onClick={() => setShowAllJd(v => !v)}
+                        className="text-[10px] text-[var(--primary)] hover:underline shrink-0">
+                        {showAllJd ? "收起" : `view all ${sortedJd.length}`}
+                      </button>
+                    )}
+                  </div>
                   {sortedJd.length === 0 ? (
                     <p className="text-xs text-[var(--text-muted)] px-1 py-2">
                       还没有分析过 JD。<Link href="/resume" className="text-[var(--primary)] hover:underline">去适配第一份 JD →</Link>
@@ -1435,12 +1445,6 @@ export default function HomePage() {
                             tone={tone} pill={st.label} pillCls={st.pill} />
                         )
                       })}
-                      {sortedJd.length > LIMIT && (
-                        <button onClick={() => setShowAllJd(v => !v)}
-                          className="mt-1.5 ml-1 text-xs text-[var(--primary)] hover:underline">
-                          {showAllJd ? "收起" : `view all (${sortedJd.length})`}
-                        </button>
-                      )}
                     </>
                   )}
                 </div>
@@ -1469,9 +1473,10 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ── 历史简历(中栏) ── */}
+      {/* ── 历史简历 + 提醒(同一行)── */}
       {loaded && (
-        <div className="mb-4">
+        <div className="flex flex-col lg:flex-row gap-4 mb-4">
+          <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-baseline gap-2">
               <SheetCode>R-03 / VERSIONS</SheetCode>
@@ -1527,25 +1532,12 @@ export default function HomePage() {
               ))}
             </div>
           )}
-        </div>
-      )}
+          </div>{/* 历史简历 cell 结束 */}
 
-        </div>{/* ===== 中栏结束 ===== */}
-
-        {/* ===== 右栏:日历系统(贯穿整个右侧) ===== */}
-        <aside className="lg:w-80 shrink-0 flex flex-col gap-4">
-          <div>
-            <div className="flex items-baseline gap-2 mb-2">
-              <SheetCode>R-04 / CALENDAR</SheetCode>
-              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">求职日历</h3>
-            </div>
-            <HomeCalendar events={customEvents} onAdd={(date, title) => handleAddEvent({ date, title, type: "日程", time: "" })} onDelete={handleDeleteCustomEvent} />
-          </div>
-
-          {/* ── 提醒(移到日历下方,与中栏历史简历齐平,平衡左右栏高度)── */}
+          {/* 提醒(与历史简历同一行) */}
           {activeReminders.length > 0 && (
-            <div>
-              <div className="flex items-baseline gap-2 mb-2">
+            <div className="lg:w-72 shrink-0">
+              <div className="flex items-baseline gap-2 mb-3">
                 <SheetCode>R-05 / ALERTS</SheetCode>
                 <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">提醒</h3>
               </div>
@@ -1565,6 +1557,20 @@ export default function HomePage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+        </div>{/* ===== 中栏结束 ===== */}
+
+        {/* ===== 右栏:日历系统(贯穿整个右侧) ===== */}
+        <aside className="lg:w-80 shrink-0 flex flex-col gap-4">
+          <div>
+            <div className="flex items-baseline gap-2 mb-2">
+              <SheetCode>R-04 / CALENDAR</SheetCode>
+              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">求职日历</h3>
+            </div>
+            <HomeCalendar events={customEvents} onAdd={(date, title) => handleAddEvent({ date, title, type: "日程", time: "" })} onDelete={handleDeleteCustomEvent} />
+          </div>
         </aside>
       </div>{/* ===== flex 结束 ===== */}
 
