@@ -1563,29 +1563,9 @@ export default function HomePage() {
         )
       })()}
 
-      {/* ── 面试提醒（下方）── */}
-      {loaded && showPriorityCard && (
-        <div className="mb-4 flex items-center gap-4 px-5 py-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden relative">
-          <div className="absolute left-0 top-0 bottom-0 w-0.5 rounded-l-xl"
-            style={{ background: urgentDays! <= 1 ? "#B6634A" : urgentDays! <= 3 ? "#C0954E" : "#2E5B54" }} />
-          <div className="pl-3 flex-1 min-w-0">
-            <p className="text-xs text-[var(--text-muted)] font-semibold uppercase tracking-wider mb-0.5">面试提醒</p>
-            <p className="text-sm font-semibold text-[var(--text-main)] truncate">{urgentApp.company} · {urgentApp.position}</p>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">
-              {urgentDays === 0 ? "今天面试" : urgentDays === 1 ? "明天面试" : `${urgentDays} 天后面试`}
-              <span className="ml-1.5">{urgentApp.status}</span>
-            </p>
-          </div>
-          <Link href="/tracker" className="shrink-0 px-4 py-2 bg-[var(--text-main)] text-white text-xs font-semibold rounded-xl hover:opacity-85 transition-opacity">
-            查看详情
-          </Link>
-        </div>
-      )}
-
-      {/* ── 历史简历 + 提醒(同一行)── */}
+      {/* ── 历史简历版本(核心产物)── */}
       {loaded && (
-        <div className="flex flex-col lg:flex-row gap-4 mb-4">
-          <div className="flex-1 min-w-0">
+        <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-baseline gap-2">
               <SheetCode>R-03 / VERSIONS</SheetCode>
@@ -1641,46 +1621,10 @@ export default function HomePage() {
               ))}
             </div>
           )}
-          </div>{/* 历史简历 cell 结束 */}
-
-          {/* 提醒(与历史简历同一行) */}
-          {activeReminders.length > 0 && (
-            <div className="lg:w-72 shrink-0">
-              <div className="flex items-baseline gap-2 mb-3">
-                <SheetCode>R-05 / ALERTS</SheetCode>
-                <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">提醒</h3>
-              </div>
-              <div className="space-y-2">
-                {activeReminders.map(r => (
-                  <div key={r.key} className="flex items-start gap-3 px-4 py-3 bg-[var(--surface2)] border border-[var(--border)] rounded-xl">
-                    <span className="text-base shrink-0 mt-0.5">{r.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-[var(--text-main)]">{r.message}</p>
-                      {r.subtext && <p className="text-xs text-[var(--text-muted)] mt-0.5">{r.subtext}</p>}
-                      {r.type === "inactivity" && <Link href="/tracker" className="text-xs text-[var(--primary)] hover:underline font-semibold mt-1 inline-block">去投递看板 →</Link>}
-                      {r.type === "season" && <button onClick={() => setShowTimelineSettings(true)} className="text-xs text-[var(--primary)] hover:underline font-semibold mt-1">设置时间线 →</button>}
-                    </div>
-                    <button onClick={() => dismissReminder(r.key)} className="text-[var(--text-muted)] hover:text-[var(--text-main)] text-base leading-none shrink-0">×</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
         </div>{/* ===== 中栏结束 ===== */}
-
-        {/* ===== 右栏:日历系统(贯穿整个右侧) ===== */}
-        <aside className="lg:w-80 shrink-0 flex flex-col gap-4">
-          <div>
-            <div className="flex items-baseline gap-2 mb-2">
-              <SheetCode>R-04 / CALENDAR</SheetCode>
-              <h3 className="text-base font-bold text-[var(--text-main)] font-cartoon">求职日历</h3>
-            </div>
-            <HomeCalendar events={customEvents} onAdd={(date, title) => handleAddEvent({ date, title, type: "日程", time: "" })} onDelete={handleDeleteCustomEvent} />
-          </div>
-        </aside>
       </div>{/* ===== flex 结束 ===== */}
 
       {/* ── Modals ── */}

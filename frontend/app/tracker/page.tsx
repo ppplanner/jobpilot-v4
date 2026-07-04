@@ -28,6 +28,14 @@ const TIERS    = ["冲刺", "匹配", "保底"]
 const SOURCES  = ["官网/APP", "内推", "Boss直聘", "拉勾", "猎聘", "牛客", "其他"]
 const ROUNDS   = ["笔试", "一面", "二面", "HR面", "综合面"]
 
+// 招聘季(用于提醒)——从首页迁来,过程提醒的自然归属地
+const SEASONS = [
+  { name: "秋招", start: [8, 1],  end: [10, 31] },
+  { name: "春招", start: [2, 1],  end: [4, 30] },
+  { name: "实习", start: [3, 1],  end: [6, 15] },
+]
+type ProcessReminder = { key: string; type: "inactivity" | "season" | "goal"; icon: string; message: string; subtext?: string }
+
 // ===== 星级评分组件 =====
 function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
@@ -486,6 +494,47 @@ export default function TrackerPage() {
 
   useEffect(() => { loadApps() }, [])
 
+  // 求职提醒(从首页迁来:未投递惰性 / 招聘季 / 目标超期)——沿用 jobpilot_notif_ 关闭标记
+  const [reminders, setReminders] = useState<ProcessReminder[]>([])
+  useEffect(() => {
+    if (loading) return
+    const today = new Date()
+    const todayStr = today.toISOString().slice(0, 10)
+    const rs: ProcessReminder[] = []
+    if (apps.length > 0) {
+      const last = apps.map(a => a.applied_date).filter(Boolean).sort().at(-1)
+      if (last) {
+        const days = Math.floor((today.getTime() - new Date(last + "T00:00:00").getTime()) / 86400000)
+        const key = `inactivity_${todayStr}`
+        if (days >= 7 && localStorage.getItem(`jobpilot_notif_${key}`) !== "1")
+          rs.push({ key, type: "inactivity", icon: "⏰", message: `你已 ${days} 天未投递新简历`, subtext: "保持稳定的投递节奏有助于提升面试机会" })
+      }
+    }
+    SEASONS.forEach(s => {
+      const start = new Date(today.getFullYear(), s.start[0] - 1, s.start[1])
+      const d = Math.floor((start.getTime() - today.getTime()) / 86400000)
+      if (d >= 0 && d <= 7) {
+        const key = `season_${s.name}_${today.getFullYear()}`
+        if (localStorage.getItem(`jobpilot_notif_${key}`) !== "1")
+          rs.push({ key, type: "season", icon: "📅", message: `${s.name}还有 ${d} 天开始`, subtext: `${s.start[0]}月${s.start[1]}日 — ${s.end[0]}月${s.end[1]}日，建议提前规划投递节奏` })
+      }
+    })
+    try {
+      const tl = JSON.parse(localStorage.getItem("jobpilot_timeline") || "{}")
+      if (tl.target_date) {
+        const target = new Date(tl.target_date + "T00:00:00")
+        const key = `goal_${tl.target_date}`
+        if (today > target && !apps.some(a => a.status === "Offer") && localStorage.getItem(`jobpilot_notif_${key}`) !== "1")
+          rs.push({ key, type: "goal", icon: "🎯", message: `已超过目标日期（${tl.target_date}），尚未收到 Offer`, subtext: "可在求职日历调整目标时间，或调整求职策略" })
+      }
+    } catch {}
+    setReminders(rs)
+  }, [loading, apps])
+  const dismissReminder = (key: string) => {
+    localStorage.setItem(`jobpilot_notif_${key}`, "1")
+    setReminders(prev => prev.filter(r => r.key !== key))
+  }
+
   const loadApps = async () => {
     try {
       const data = await api.applications.getAll()
@@ -591,6 +640,22 @@ export default function TrackerPage() {
           + 新增投递
         </button>
       </div>
+
+      {/* 求职提醒(从首页迁来) */}
+      {reminders.length > 0 && (
+        <div className="space-y-2 mb-4">
+          {reminders.map(r => (
+            <div key={r.key} className="flex items-start gap-3 px-4 py-3 bg-[var(--surface2)] border border-[var(--border)] rounded-xl">
+              <span className="text-base shrink-0 mt-0.5">{r.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-[var(--text-main)]">{r.message}</p>
+                {r.subtext && <p className="text-xs text-[var(--text-muted)] mt-0.5">{r.subtext}</p>}
+              </div>
+              <button onClick={() => dismissReminder(r.key)} className="text-[var(--text-muted)] hover:text-[var(--text-main)] text-base leading-none shrink-0">×</button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* 漏斗统计图:左=各阶段数量,右=转化率 */}
       <div className="mb-4">
