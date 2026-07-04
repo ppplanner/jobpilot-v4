@@ -1100,6 +1100,31 @@ export default function HomePage() {
   const [showAllMine, setShowAllMine] = useState(false)
   const [showAllJd, setShowAllJd]     = useState(false)
 
+  // 首页视图模式(Phase 1 原型):chat=极简对话入口 / dashboard=现有完整视图
+  const [homeView, setHomeView] = useState<"chat" | "dashboard">("dashboard")
+  useEffect(() => {
+    try { const v = localStorage.getItem("jobpilot_home_view"); if (v === "chat" || v === "dashboard") setHomeView(v) } catch {}
+  }, [])
+  const switchView = (v: "chat" | "dashboard") => {
+    setHomeView(v)
+    try { localStorage.setItem("jobpilot_home_view", v) } catch {}
+  }
+  const [chatMsgs, setChatMsgs]       = useState<{ role: string; content: string }[]>([])
+  const [chatInput, setChatInput]     = useState("")
+  const [chatSending, setChatSending] = useState(false)
+  const sendChat = async (text?: string) => {
+    const content = (text ?? chatInput).trim()
+    if (!content || chatSending) return
+    const next = [...chatMsgs, { role: "user", content }]
+    setChatMsgs(next); setChatInput(""); setChatSending(true)
+    try {
+      const r = await api.ai.chat(next, "general")
+      setChatMsgs([...next, { role: "assistant", content: r.content || "(无回复)" }])
+    } catch {
+      setChatMsgs([...next, { role: "assistant", content: "AI 暂时不可用，请稍后再试，或到「设置」检查 API Key。" }])
+    } finally { setChatSending(false) }
+  }
+
   const dismissGuide = () => {
     localStorage.setItem("jobpilot_onboarding_v1_done", "1")
     setShowGuide(false)
@@ -1301,8 +1326,92 @@ export default function HomePage() {
     try { return JSON.parse(json)?.overall_score ?? null } catch { return null }
   }
 
+  // ===== Phase 1 原型:极简对话首页 =====
+  if (homeView === "chat") {
+    const hasChat = chatMsgs.length > 0
+    const latest = resumeVersions[0]
+    const suggestions = [
+      "把我的简历适配到某个目标岗位",
+      "帮我拆解这段 JD 的能力要求",
+      "转行做产品经理，简历该怎么写",
+      "看看我的求职进度，下一步该做什么",
+    ]
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8 min-h-[82vh] flex flex-col" style={SHEET_GRID}>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-0.5">Assistant</p>
+            <h1 className="text-xl font-bold text-[var(--text-main)] font-cartoon">求职助手</h1>
+          </div>
+          <button onClick={() => switchView("dashboard")}
+            className="text-xs text-[var(--text-muted)] hover:text-[var(--primary)] border border-[var(--border)] rounded-lg px-3 py-1.5 transition-colors">
+            完整视图 →
+          </button>
+        </div>
+
+        {!hasChat ? (
+          <div className="flex-1 flex flex-col justify-center">
+            <h2 className="text-2xl font-bold text-center text-[var(--text-main)] font-cartoon mb-2">今天想做什么？</h2>
+            <p className="text-center text-sm text-[var(--text-muted)] mb-7">告诉我你的目标岗位，或直接粘贴 JD，我帮你把简历改到位。</p>
+            <div className="flex flex-wrap justify-center gap-2 max-w-xl mx-auto">
+              {suggestions.map(s => (
+                <button key={s} onClick={() => sendChat(s)}
+                  className="text-xs text-[var(--text-sub)] bg-[var(--surface)] border border-[var(--border)] rounded-full px-3 py-2 hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors">
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 space-y-4 mb-4">
+            {chatMsgs.map((m, i) => (
+              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+                  m.role === "user"
+                    ? "bg-[var(--primary)] text-white"
+                    : "bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)]"
+                }`}>{m.content}</div>
+              </div>
+            ))}
+            {chatSending && <div className="text-xs text-[var(--text-muted)] px-1">正在思考…</div>}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Link href="/resume" className="text-xs text-[var(--primary)] border border-[var(--border)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface2)] transition-colors">去简历工作台 →</Link>
+              <Link href="/jd-analysis" className="text-xs text-[var(--primary)] border border-[var(--border)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface2)] transition-colors">拆解 JD →</Link>
+              <Link href="/tracker" className="text-xs text-[var(--primary)] border border-[var(--border)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface2)] transition-colors">投递看板 →</Link>
+            </div>
+          </div>
+        )}
+
+        <div className="sticky bottom-4 mt-2">
+          <div className="flex items-end gap-2 bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-2 shadow-sm">
+            <textarea value={chatInput} onChange={e => setChatInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat() } }}
+              rows={1} placeholder="描述你的目标岗位，或粘贴 JD / 简历片段…"
+              className="flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-[var(--text-main)] outline-none placeholder:text-[var(--text-muted)] max-h-32" />
+            <button onClick={() => sendChat()} disabled={!chatInput.trim() || chatSending}
+              className="shrink-0 px-4 py-2 bg-[var(--primary)] text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40">
+              {chatSending ? "…" : "发送"}
+            </button>
+          </div>
+          {(latest || activeReminders.length > 0) && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 px-1 text-xs text-[var(--text-muted)]">
+              {latest && <Link href={`/resume?version_id=${latest.id}`} className="hover:text-[var(--primary)]">最近简历：{latest.version_name}</Link>}
+              {activeReminders[0] && <span>· {activeReminders[0].message}</span>}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8" style={SHEET_GRID}>
+      <div className="flex justify-end mb-3">
+        <button onClick={() => switchView("chat")}
+          className="text-xs text-[var(--text-muted)] hover:text-[var(--primary)] border border-[var(--border)] rounded-lg px-3 py-1.5 transition-colors">
+          ✦ 极简对话模式 →
+        </button>
+      </div>
       <div className="flex flex-col lg:flex-row gap-6">
         {/* ===== 中栏:主内容(压缩) ===== */}
         <div className="flex-1 min-w-0">
