@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, type ReactNode } from "react"
+import { SHEET_GRID, SheetCard, SheetHeading } from "@/components/blueprint"
 
 const API = ""
 
@@ -41,13 +42,12 @@ interface Skill {
 const INPUT = "w-full border border-[var(--border)] bg-[var(--surface2)] rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-[var(--primary)] transition-colors placeholder:text-[var(--text-muted)]"
 const LABEL = "text-xs text-[var(--text-muted)] mb-1 block"
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// 区块:图纸编号标题 + 图纸卡片(与首页各区一致)
+function Section({ code, title, children }: { code: string; title: string; children: ReactNode }) {
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
-      <div className="px-5 py-3 bg-[var(--surface2)] border-b border-[var(--border)]">
-        <h2 className="font-semibold text-[var(--text-main)] text-sm">{title}</h2>
-      </div>
-      <div className="p-5">{children}</div>
+    <div>
+      <SheetHeading code={code} title={title} />
+      <SheetCard><div className="p-5">{children}</div></SheetCard>
     </div>
   )
 }
@@ -55,7 +55,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 const LEVEL_STYLE: Record<string, string> = {
   精通: "bg-[var(--primary)] text-white",
   熟练: "bg-[var(--surface2)] text-[var(--primary)] border border-[var(--border)]",
-  了解: "bg-gray-100 text-gray-600",
+  了解: "bg-[var(--surface2)] text-[var(--text-muted)] border border-[var(--border)]",
 }
 
 export default function ProfilePage() {
@@ -233,46 +233,47 @@ export default function ProfilePage() {
   ] as const
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-[var(--text-main)]">简历素材库</h1>
-        <p className="text-xs text-[var(--text-muted)] mt-0.5">在这里维护你的实习、项目和技能，简历工作台可直接调取，无需每次重新粘贴</p>
+    <div className="max-w-6xl mx-auto px-4 py-8" style={SHEET_GRID}>
+      <div className="mb-5">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-0.5">Material Library</p>
+        <h1 className="text-xl font-bold text-[var(--text-main)] font-cartoon">简历素材库</h1>
+        <p className="text-xs text-[var(--text-muted)] mt-1">维护实习、项目和技能，简历工作台与首页能力图层可直接调取，无需每次重新粘贴。</p>
       </div>
 
-      {/* PM 方向选择 */}
-      <div className="bg-[var(--surface)] border-2 border-[var(--primary)] rounded-xl p-5 mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <p className="text-sm font-semibold text-[var(--text-main)]">我的目标 PM 方向</p>
-          <span className="text-xs bg-[var(--surface2)] text-[var(--primary)] px-2 py-0.5 rounded-full">影响简历改写和题库筛选</span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {PM_DIRECTIONS.map(d => {
-            const isSelected = (basic.target_role || "产品经理") === d.key
-            return (
-              <button
-                key={d.key}
-                onClick={() => setBasic({ ...basic, target_role: d.key })}
-                className={`p-3 rounded-xl border text-left transition-all ${
-                  isSelected
-                    ? "border-[var(--primary)] bg-[var(--primary-bg)]"
-                    : "border-[var(--border)] bg-[var(--surface2)] hover:border-[var(--primary)]/50"
-                }`}
-              >
-                <div className="text-xl mb-1">{d.emoji}</div>
-                <div className={`text-xs font-semibold ${isSelected ? "text-[var(--primary)]" : "text-[var(--text-main)]"}`}>{d.label}</div>
-                <div className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-tight">{d.desc}</div>
-              </button>
-            )
-          })}
-        </div>
-        <p className="text-xs text-[var(--text-muted)] mt-3">
-          当前方向：<strong className="text-[var(--primary)]">{basic.target_role || "产品经理"}</strong>
-          ——选好后记得点「保存基本信息」
-        </p>
+      {/* PM 方向 */}
+      <div className="mb-4">
+        <SheetHeading code="P-01 / DIRECTION" title="目标 PM 方向"
+          right={<span className="text-xs text-[var(--text-muted)]">影响简历改写与题库筛选</span>} />
+        <SheetCard>
+          <div className="p-5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {PM_DIRECTIONS.map(d => {
+                const isSelected = (basic.target_role || "产品经理") === d.key
+                return (
+                  <button
+                    key={d.key}
+                    onClick={() => setBasic({ ...basic, target_role: d.key })}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      isSelected
+                        ? "border-[var(--primary)] bg-[var(--primary-bg)]"
+                        : "border-[var(--border)] bg-[var(--surface2)] hover:border-[var(--primary)]/50"
+                    }`}
+                  >
+                    <div className={`text-sm font-semibold ${isSelected ? "text-[var(--primary)]" : "text-[var(--text-main)]"}`}>{d.label}</div>
+                    <div className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-tight">{d.desc}</div>
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-xs text-[var(--text-muted)] mt-3">
+              当前方向：<strong className="text-[var(--primary)]">{basic.target_role || "产品经理"}</strong> ——选好后到「基本信息」点保存。
+            </p>
+          </div>
+        </SheetCard>
       </div>
 
       {saveMsg && (
-        <div className="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
+        <div className="mb-4 px-4 py-3 bg-[var(--primary-bg)] border border-[var(--border)] rounded-xl text-sm text-[var(--primary)] font-medium">
           {saveMsg}
         </div>
       )}
@@ -296,7 +297,7 @@ export default function ProfilePage() {
 
       {/* 基本信息 */}
       {tab === "basic" && (
-        <Section title="基本信息">
+        <Section code="P-02 / BASIC" title="基本信息">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               { key: "name",        label: "姓名",     ph: "张三" },
@@ -391,7 +392,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex gap-1 shrink-0">
                           <button onClick={() => startEditIntern(item)} className="text-xs text-[var(--primary)] hover:opacity-70 transition-opacity px-2 py-1">编辑</button>
-                          <button onClick={() => delIntern(item.id)} className="text-xs text-red-400 hover:text-red-600 transition-colors px-2 py-1">删除</button>
+                          <button onClick={() => delIntern(item.id)} className="text-xs text-[var(--text-muted)] hover:text-[#B6634A] transition-colors px-2 py-1">删除</button>
                         </div>
                       </div>
                       {item.highlights && (
@@ -404,7 +405,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <Section title="添加实习经历">
+          <Section code="P-03 / INTERNSHIP" title="添加实习经历">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className={LABEL}>公司名称 *</label>
@@ -509,7 +510,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex gap-1 shrink-0">
                           <button onClick={() => startEditProj(item)} className="text-xs text-[var(--primary)] hover:opacity-70 transition-opacity px-2 py-1">编辑</button>
-                          <button onClick={() => delProj(item.id)} className="text-xs text-red-400 hover:text-red-600 px-2 py-1">删除</button>
+                          <button onClick={() => delProj(item.id)} className="text-xs text-[var(--text-muted)] hover:text-[#B6634A] px-2 py-1">删除</button>
                         </div>
                       </div>
                       {item.contribution && (
@@ -525,7 +526,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <Section title="添加项目经历">
+          <Section code="P-04 / PROJECT" title="添加项目经历">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={LABEL}>项目名称 *</label>
@@ -597,7 +598,7 @@ export default function ProfilePage() {
                           </span>
                           <span className="text-xs text-[var(--text-muted)]">{s.level}</span>
                           <button onClick={() => delSkill(s.id)}
-                            className="text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all text-xs">
+                            className="text-[var(--text-muted)] hover:text-[#B6634A] opacity-0 group-hover:opacity-100 transition-all text-xs">
                             ×
                           </button>
                         </div>
@@ -609,7 +610,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <Section title="添加技能">
+          <Section code="P-05 / SKILL" title="添加技能">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className={LABEL}>分类</label>

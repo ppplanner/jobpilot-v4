@@ -36,6 +36,9 @@
 
 ## 改动日志
 
+### 2026-07-04
+- **蓝图皮肤抽成共享组件 + 素材库 `/profile` 套用重排**:① 新增 `frontend/components/blueprint.tsx`,把原本写在首页 `page.tsx` 里的皮肤件抽出并扩充,导出 `SHEET_GRID`(网格底纹)/`SheetCorners`(四角角标)/`SheetCode`(等宽编号标)/`SheetCard`(白底+角标+网格卡片)/`SheetHeading`(编号+卡通标题);首页改为从该组件 import(删掉本地重复定义,移除不再使用的 `type ReactNode` 导入)。② `profile/page.tsx` 按首页卡片语言重排,去冗杂:删除 2px 粗绿边的「PM 方向」大盒子外壳与所有 emoji(`PM_DIRECTIONS.emoji` 字段保留但不再渲染)、去掉灰色填充的 Section 标题条(`Section` 重写为 `SheetHeading + SheetCard`)、保存提示从亮绿 `green-50/200/700` 改为主色系 `--primary-bg`;各区加图纸编号 `P-01…P-05`;页面加网格底纹;实习/项目/技能删除按钮由 `red-*` 改为陶土 `#B6634A`(与首页一致);技能等级「了解」灰色 `gray-100/600` 改为 `--surface2/--text-muted`。功能(Tab、增删改、`?focus=` 跳转高亮)全部未动。`tsc` 通过,截图确认。仍在分支 `redesign/blueprint-skin`。
+
 ### 2026-07-03
 - **首页精简(承接蓝图皮肤,做减法)**:① Hero「简历适配蓝图」去掉 01/02/03/04 四步进度网格(`BlueprintStage` 不再在页面渲染,函数保留),退回更简洁的「一句话介绍 + CTA + 右上角 4 个淡描边概念标签」形式(接近 `306650e` 版但保留蓝图网格底纹,`R-01` 挪到卡片右下角)。原因:用户反馈四步网格"太流程化/太复杂,不如之前"。② 删除右栏「求职路径」统计卡(简历改写/累计投递/待面试/Offer 四个数),与投递看板重复、首页信息冗余;右栏现仅保留求职日历。`tsc` 通过,截图确认。仍在分支 `redesign/blueprint-skin`。
 - **首页「蓝图皮肤」reskin(只换皮肤,不动结构/功能)**:在 `frontend/app/page.tsx` 叠加一层建筑制图质感,主色卡(墨绿/薄荷/米杏)与三栏布局全部保持不变。新增三个轻量皮肤件:`SHEET_GRID`(淡墨绿内联网格底纹,不改全局 `globals.css`)、`SheetCorners`(卡片四角 L 形描线角标,需放进 `relative` 容器)、`SheetCode`(等宽字图纸编号小标)。应用点:页面外层加网格底纹;Hero 右上角 `R-01`;能力图层卡 `R-02 / LAYERS` + 角标 + 网格;历史简历 `R-03 / VERSIONS`;求职日历卡角标 + `R-04 / CALENDAR`;求职路径卡 `R-05 / PATH` + 角标 + 网格。注意:加了网格/角标(absolute)的卡片,其内容 wrapper 需补 `relative` 以盖在网格之上(能力卡内层 grid、求职路径 `space-y-3.5` 已补)。范围仅首页,其他页未动(用户选择:先在首页立住风格)。`tsc --noEmit` 通过,Playwright 截图确认渲染正常。分支 `redesign/blueprint-skin`,未合回 main。**决策背景**:用户觉得原首页"成套仪表盘、没自己特点";定的方向是「蓝图叠图」隐喻(贴合其城乡规划转行背景),但本轮只做低风险换皮肤,暂不做结构性叙事改造。

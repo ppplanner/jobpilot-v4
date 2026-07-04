@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect, useMemo, type ReactNode } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { useProfile } from "@/lib/useProfile"
 import { api, CalendarEvent, CustomCalendarEvent, ResumeVersion, MyTag, JdTag } from "@/lib/api"
+import { SHEET_GRID, SheetCorners, SheetCode } from "@/components/blueprint"
 
 const API = ""
 
@@ -23,35 +24,6 @@ const STATUS_STYLE: Record<string, { icon: string; pill: string; label: string }
   缺口: { icon: "bg-[#B6634A]", pill: "bg-[#F1E0DA] text-[#9E4631]", label: "缺口" },
 }
 const DOMAIN_ORDER = ["direction", "method", "domain", "tooling", "soft"]
-
-// ===== 蓝图皮肤(只换皮肤:保留墨绿主色,叠加图纸/描图纸质感) =====
-// 淡墨绿网格底纹(描图纸感)——用内联样式,不动全局 globals.css
-const SHEET_GRID = {
-  backgroundImage:
-    "linear-gradient(to right, rgba(46,91,84,0.05) 1px, transparent 1px)," +
-    "linear-gradient(to bottom, rgba(46,91,84,0.05) 1px, transparent 1px)",
-  backgroundSize: "24px 24px",
-}
-// 图纸四角角标(L 形描线),需放进 position:relative 的容器
-function SheetCorners() {
-  const base = "pointer-events-none absolute w-2.5 h-2.5 border-[var(--primary)]/25"
-  return (
-    <>
-      <span className={`${base} left-2 top-2 border-l border-t`} />
-      <span className={`${base} right-2 top-2 border-r border-t`} />
-      <span className={`${base} left-2 bottom-2 border-l border-b`} />
-      <span className={`${base} right-2 bottom-2 border-r border-b`} />
-    </>
-  )
-}
-// 图纸编号小标(等宽字,drafting caption)
-function SheetCode({ children }: { children: ReactNode }) {
-  return (
-    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
-      {children}
-    </span>
-  )
-}
 
 type SketchTone = "green" | "ochre" | "terra" | "muted"
 type SketchPose = "point" | "read" | "carry" | "mark"
