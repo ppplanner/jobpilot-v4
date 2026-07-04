@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { SHEET_GRID } from "@/components/blueprint"
 
 const API = ""
 
@@ -80,15 +81,16 @@ export default function JdAnalysisPage() {
   const inputCls = "w-full border border-[var(--border)] bg-[var(--surface2)] rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-[var(--primary)] transition-colors placeholder:text-[var(--text-muted)]"
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8" style={SHEET_GRID}>
       <div className="mb-6">
         {fromResumePage && (
           <a href="/resume" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-sub)] flex items-center gap-1 mb-2">
             ← 返回简历工作台
           </a>
         )}
-        <h1 className="text-xl font-bold text-[var(--text-main)] mb-1">JD 匹配分析</h1>
-        <p className="text-xs text-[var(--text-muted)]">对比简历与岗位 JD，定位差距和修改方向</p>
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-0.5">JD Match Analysis</p>
+        <h1 className="text-xl font-bold text-[var(--text-main)] font-cartoon">JD 匹配分析</h1>
+        <p className="text-xs text-[var(--text-muted)] mt-1">对比简历与岗位 JD，定位差距和修改方向</p>
       </div>
 
       {/* 输入区域 */}
@@ -120,7 +122,7 @@ export default function JdAnalysisPage() {
             </div>
           </div>
 
-          {error && <div className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</div>}
+          {error && <div className="text-sm text-[#9E4631] bg-[#F1E0DA] rounded-lg px-3 py-2">{error}</div>}
 
           <div className="flex justify-end">
             <button onClick={analyze} disabled={loading}
@@ -167,7 +169,7 @@ export default function JdAnalysisPage() {
                     <svg viewBox="0 0 36 36" className="w-20 h-20 -rotate-90">
                       <circle cx="18" cy="18" r="15.9" fill="none" stroke="#F3EFE8" strokeWidth="3" />
                       <circle cx="18" cy="18" r="15.9" fill="none"
-                        stroke={result.overall_score >= 75 ? "#22C55E" : result.overall_score >= 50 ? "#F59E0B" : "#EF4444"}
+                        stroke={result.overall_score >= 75 ? "#4F8063" : result.overall_score >= 50 ? "#C0954E" : "#B6634A"}
                         strokeWidth="3" strokeDasharray={`${result.overall_score} 100`} strokeLinecap="round" />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -180,9 +182,9 @@ export default function JdAnalysisPage() {
                         {company || "目标公司"}{position ? ` · ${position}` : ""}
                       </h2>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        result.overall_score >= 75 ? "bg-green-100 text-green-700" :
-                        result.overall_score >= 50 ? "bg-amber-100 text-amber-700" :
-                        "bg-red-100 text-red-700"
+                        result.overall_score >= 75 ? "bg-[#E3EDE3] text-[#3C6B4E]" :
+                        result.overall_score >= 50 ? "bg-[#F2E9D6] text-[#876426]" :
+                        "bg-[#F1E0DA] text-[#9E4631]"
                       }`}>
                         {result.overall_score >= 75 ? "强匹配" : result.overall_score >= 50 ? "中等匹配" : "差距较大"}
                       </span>

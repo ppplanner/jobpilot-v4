@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { api, RewriteResult, ProfileInternship, ProfileProject, ProfileSkill, Application } from "@/lib/api"
+import { SHEET_GRID } from "@/components/blueprint"
 
 interface JDMatchItem {
   aspect: string
@@ -1069,7 +1070,7 @@ function ResumePageInner() {
   const inputCls = "w-full border border-[var(--border)] bg-[var(--surface2)] rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-[var(--primary)] transition-colors placeholder:text-[var(--text-muted)]"
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8" style={SHEET_GRID}>
       {/* 素材库同步 toast */}
       {libToast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#1a1a1a] text-white text-sm px-5 py-3 rounded-full shadow-xl animate-fade-in">
@@ -1079,8 +1080,10 @@ function ResumePageInner() {
           <button onClick={() => setLibToast(null)} className="text-white/50 hover:text-white ml-1">×</button>
         </div>
       )}
-      <div className="mb-6 overflow-hidden rounded-2xl bg-[var(--hero)] px-6 py-6 text-white">
-        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+      <div className="relative mb-6 overflow-hidden rounded-2xl bg-[var(--hero)] px-6 py-6 text-white">
+        <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
+          style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "22px 22px" }} />
+        <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div className="max-w-xl">
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">JD Resume Matching Workspace</p>
             <h1 className="text-2xl font-bold leading-tight mb-3">转行新人多 JD 简历适配台</h1>

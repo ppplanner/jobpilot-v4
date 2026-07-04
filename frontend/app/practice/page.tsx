@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { api, PersonalQuestion } from "@/lib/api"
+import { SHEET_GRID } from "@/components/blueprint"
 
 const API = ""
 
@@ -41,10 +42,10 @@ interface QuestionTypeConfig {
 }
 
 const QUESTION_TYPES: QuestionTypeConfig[] = [
-  { key: "classic",  label: "常规题",   emoji: "📚", desc: "B端PM通用能力考察",         color: "text-blue-700",   bgColor: "bg-blue-50",   borderColor: "border-blue-200"   },
-  { key: "scenario", label: "行业情景题", emoji: "🏭", desc: "给定行业背景，真实场景解题", color: "text-purple-700", bgColor: "bg-purple-50", borderColor: "border-purple-200" },
-  { key: "data",     label: "数据诊断题", emoji: "📊", desc: "数据异常分析，拆解指标下降", color: "text-amber-700",  bgColor: "bg-amber-50",  borderColor: "border-amber-200"  },
-  { key: "pressure", label: "压力反问题", emoji: "🔥", desc: "面试官刁难题，考察应变逻辑", color: "text-red-700",    bgColor: "bg-red-50",    borderColor: "border-red-200"    },
+  { key: "classic",  label: "常规题",   emoji: "📚", desc: "B端PM通用能力考察",         color: "text-[#2E5B54]", bgColor: "bg-[#E4EBE2]", borderColor: "border-[#CBD8C4]" },
+  { key: "scenario", label: "行业情景题", emoji: "🏭", desc: "给定行业背景，真实场景解题", color: "text-[#436069]", bgColor: "bg-[#E2EBEC]", borderColor: "border-[#C4D2D4]" },
+  { key: "data",     label: "数据诊断题", emoji: "📊", desc: "数据异常分析，拆解指标下降", color: "text-[#876426]", bgColor: "bg-[#F2E9D6]", borderColor: "border-[#E1D3AE]" },
+  { key: "pressure", label: "压力反问题", emoji: "🔥", desc: "面试官刁难题，考察应变逻辑", color: "text-[#9E4631]", bgColor: "bg-[#F1E0DA]", borderColor: "border-[#E3C6BC]" },
 ]
 
 const EXTRA_QUESTIONS: Question[] = [
@@ -329,10 +330,11 @@ export default function PracticePage() {
     : typeConfig
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8" style={SHEET_GRID}>
       <div className="mb-4">
-        <h1 className="text-xl font-bold text-[var(--text-main)]">刷题中心</h1>
-        <p className="text-xs text-[var(--text-muted)] mt-0.5">产品经理面试题库 · 4种题型针对性练习</p>
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-0.5">Practice Center</p>
+        <h1 className="text-xl font-bold text-[var(--text-main)] font-cartoon">刷题中心</h1>
+        <p className="text-xs text-[var(--text-muted)] mt-1">产品经理面试题库 · 4种题型针对性练习</p>
       </div>
 
       {/* 意向推荐横幅 */}
