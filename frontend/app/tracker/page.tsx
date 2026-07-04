@@ -546,6 +546,33 @@ export default function TrackerPage() {
     interviewing: apps.filter(a => ["一面","二面","HR面"].includes(a.status)).length,
     offers:       apps.filter(a => a.status === "Offer").length,
   }
+  // 漏斗各阶段数量 + 转化率(进面及以上=面试中+Offer,近似"曾进入面试")
+  const written          = apps.filter(a => a.status === "笔试").length
+  const reachedInterview = stats.interviewing + stats.offers
+  const convToInterview  = stats.total > 0 ? Math.round((reachedInterview / stats.total) * 100) : 0
+  const convToOffer      = reachedInterview > 0 ? Math.round((stats.offers / reachedInterview) * 100) : 0
+
+  // 数据驱动的智能建议
+  type Advice = { key: string; tone: "warn" | "info"; icon: string; title: string; desc: string; href: string; cta: string }
+  const advices: Advice[] = []
+  if (stats.total >= 8 && convToInterview < 20) {
+    advices.push({
+      key: "resume", tone: "warn", icon: "✎",
+      title: "投得不少，但进面率偏低",
+      desc: `已投 ${stats.total} 家，仅 ${convToInterview}% 进入面试。简历可能没能对上岗位关键词，建议回工作台针对性改写后再投。`,
+      href: "/resume", cta: "去优化简历 →",
+    })
+  }
+  if (reachedInterview >= 3) {
+    advices.push({
+      key: "interview", tone: "info", icon: "◇",
+      title: `已有 ${reachedInterview} 次进面，抓好准备与复盘`,
+      desc: convToOffer < 40
+        ? `面试→Offer 转化 ${convToOffer}%，还有提升空间。面前刷题演练，面后点开投递记录填写复盘，把被问到的问题沉淀下来。`
+        : `保持节奏：面前刷题演练，面后点开投递记录填写复盘，把经验沉淀下来。`,
+      href: "/practice", cta: "去刷题准备 →",
+    })
+  }
 
   const inputCls = "w-full px-3 py-2 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface2)] text-[var(--text-main)] focus:outline-none focus:border-[var(--primary)] transition-colors"
 
@@ -565,53 +592,86 @@ export default function TrackerPage() {
         </button>
       </div>
 
-      {/* 统计卡片(概览) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-        {[
-          { value: stats.total,        label: "总投递" },
-          { value: stats.active,       label: "进行中" },
-          { value: stats.interviewing, label: "面试中" },
-          { value: stats.offers,       label: "Offer" },
-        ].map(s => (
-          <SheetCard key={s.label}>
-            <div className="p-4 text-center">
-              <div className="text-2xl font-bold text-[var(--text-main)] tracking-tight">{s.value}</div>
-              <div className="text-xs text-[var(--text-muted)] mt-1">{s.label}</div>
+      {/* 漏斗统计图:左=各阶段数量,右=转化率 */}
+      <div className="mb-4">
+        <SheetHeading code="T-01 / FUNNEL" title="投递漏斗" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* 数量图(各阶段条形) */}
+          <SheetCard>
+            <div className="p-5">
+              <p className="text-xs font-semibold text-[var(--text-sub)] mb-3">各阶段数量</p>
+              <div className="space-y-2.5">
+                {[
+                  { label: "已投递", count: stats.total,        color: "#5B7E86" },
+                  { label: "笔试",   count: written,            color: "#9C8B70" },
+                  { label: "面试",   count: reachedInterview,   color: "#C0954E" },
+                  { label: "Offer",  count: stats.offers,       color: "#4F8063" },
+                ].map(st => {
+                  const pct = stats.total > 0 ? Math.max((st.count / stats.total) * 100, st.count > 0 ? 6 : 0) : 0
+                  return (
+                    <div key={st.label} className="flex items-center gap-2">
+                      <span className="text-xs text-[var(--text-sub)] w-12 shrink-0">{st.label}</span>
+                      <div className="flex-1 h-5 rounded-md bg-[var(--surface2)] overflow-hidden">
+                        <div className="h-full rounded-md transition-all duration-500" style={{ width: `${pct}%`, background: st.color }} />
+                      </div>
+                      <span className="text-sm font-semibold text-[var(--text-main)] w-6 text-right shrink-0">{st.count}</span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </SheetCard>
-        ))}
-      </div>
 
-      {/* 投递漏斗(框架:即使为 0 也画出各阶段,不留空) */}
-      <div className="mb-4">
-        <SheetHeading code="T-01 / PIPELINE" title="投递漏斗" />
-        <SheetCard>
-          <div className="p-5">
-            <div className="flex items-stretch gap-2">
-              {[
-                { label: "已投递", count: stats.total },
-                { label: "笔试",   count: apps.filter(a => a.status === "笔试").length },
-                { label: "面试",   count: stats.interviewing },
-                { label: "Offer",  count: stats.offers },
-              ].map((st, i, arr) => (
-                <div key={st.label} className="flex items-center gap-2 flex-1 min-w-0">
-                  <div className={`flex-1 rounded-xl px-3 py-3 text-center transition-colors ${
-                    st.count > 0
-                      ? "bg-[var(--surface2)] border border-[var(--border)]"
-                      : "border border-dashed border-[var(--border)]"
-                  }`}>
-                    <div className={`text-xl font-bold tracking-tight ${st.count > 0 ? "text-[var(--primary)]" : "text-[var(--text-muted)]"}`}>{st.count}</div>
-                    <div className="text-[11px] text-[var(--text-muted)] mt-0.5">{st.label}</div>
+          {/* 转化率图 */}
+          <SheetCard>
+            <div className="p-5">
+              <p className="text-xs font-semibold text-[var(--text-sub)] mb-3">转化率</p>
+              <div className="space-y-4">
+                {[
+                  { label: "投递 → 面试", value: convToInterview, hint: `${reachedInterview}/${stats.total || 0}` },
+                  { label: "面试 → Offer", value: convToOffer,     hint: `${stats.offers}/${reachedInterview || 0}` },
+                ].map(c => (
+                  <div key={c.label}>
+                    <div className="flex items-baseline justify-between mb-1">
+                      <span className="text-xs text-[var(--text-sub)]">{c.label}</span>
+                      <span className="text-lg font-bold text-[var(--primary)] tracking-tight">{c.value}<span className="text-xs text-[var(--text-muted)] font-normal ml-0.5">% · {c.hint}</span></span>
+                    </div>
+                    <div className="h-2 rounded-full bg-[var(--surface2)] overflow-hidden">
+                      <div className="h-full rounded-full bg-[var(--primary)] transition-all duration-500" style={{ width: `${c.value}%` }} />
+                    </div>
                   </div>
-                  {i < arr.length - 1 && <span className="text-[var(--text-muted)] shrink-0">›</span>}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-            {stats.total === 0 && (
-              <p className="text-xs text-[var(--text-muted)] mt-3 text-center">投递后各阶段会自动填入数量,漏斗随进度生长。</p>
-            )}
+          </SheetCard>
+        </div>
+
+        {/* 数据驱动建议 */}
+        {advices.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+            {advices.map(a => (
+              <div key={a.key}
+                className={`relative overflow-hidden rounded-xl border p-4 ${
+                  a.tone === "warn" ? "border-[#E3C6BC] bg-[#F1E0DA]/50" : "border-[var(--border)] bg-[var(--surface2)]"
+                }`}>
+                <div className="flex items-start gap-3">
+                  <span className={`shrink-0 w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold ${
+                    a.tone === "warn" ? "bg-[#B6634A] text-white" : "bg-[var(--primary)] text-white"
+                  }`}>{a.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[var(--text-main)]">{a.title}</p>
+                    <p className="text-xs text-[var(--text-sub)] mt-1 leading-relaxed">{a.desc}</p>
+                    <Link href={a.href} className="inline-block text-xs font-semibold text-[var(--primary)] hover:underline mt-2">{a.cta}</Link>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </SheetCard>
+        )}
+
+        {stats.total === 0 && (
+          <p className="text-xs text-[var(--text-muted)] mt-3 text-center">投递后自动统计各阶段数量与转化率,并按数据给出优化建议。</p>
+        )}
       </div>
 
       {/* 投递记录标题 */}
