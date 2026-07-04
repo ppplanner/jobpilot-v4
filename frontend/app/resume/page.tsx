@@ -266,9 +266,9 @@ function VersionHistoryPanel({ refreshKey, autoExpandVersionId }: { refreshKey: 
                   <div className="flex items-center gap-2 shrink-0 ml-2">
                     {analysis && (
                       <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
-                        analysis.overall_score >= 80 ? "bg-green-50 text-green-700" :
-                        analysis.overall_score >= 60 ? "bg-amber-50 text-amber-700" :
-                        "bg-red-50 text-red-700"
+                        analysis.overall_score >= 80 ? "bg-[#E3EDE3] text-[#3C6B4E]" :
+                        analysis.overall_score >= 60 ? "bg-[#F2E9D6] text-[#876426]" :
+                        "bg-[#F1E0DA] text-[#9E4631]"
                       }`}>
                         {analysis.overall_score}分
                       </span>
@@ -288,9 +288,9 @@ function VersionHistoryPanel({ refreshKey, autoExpandVersionId }: { refreshKey: 
                       <div className="flex flex-wrap gap-1.5">
                         {analysis.match_items.map((item, i) => (
                           <span key={i} className={`text-xs px-2 py-0.5 rounded-full ${
-                            item.resume_status === "strong"  ? "bg-green-50 text-green-700" :
-                            item.resume_status === "weak"    ? "bg-amber-50 text-amber-700" :
-                            "bg-red-50 text-red-700"
+                            item.resume_status === "strong"  ? "bg-[#E3EDE3] text-[#3C6B4E]" :
+                            item.resume_status === "weak"    ? "bg-[#F2E9D6] text-[#876426]" :
+                            "bg-[#F1E0DA] text-[#9E4631]"
                           }`}>
                             {item.aspect}·{item.resume_status === "strong" ? "命中" : item.resume_status === "weak" ? "较弱" : "缺失"}
                           </span>
@@ -301,7 +301,7 @@ function VersionHistoryPanel({ refreshKey, autoExpandVersionId }: { refreshKey: 
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-[var(--text-muted)]">追问预警</p>
                         {analysis.follow_up_questions.map((q, i) => (
-                          <p key={i} className="text-xs text-[var(--text-sub)] pl-2 border-l-2 border-amber-300">
+                          <p key={i} className="text-xs text-[var(--text-sub)] pl-2 border-l-2 border-[#E1D3AE]">
                             {q.question}
                           </p>
                         ))}
@@ -329,7 +329,7 @@ function diffHighlight(original: string, rewritten: string): React.ReactNode {
       {parts.map((part, i) => {
         const isNew = part.trim() && !origWords.has(part.trim())
         return isNew ? (
-          <mark key={i} className="bg-yellow-100 text-yellow-900 rounded px-0.5 not-italic">{part}</mark>
+          <mark key={i} className="bg-[#F5EAD0] text-[#876426] rounded px-0.5 not-italic">{part}</mark>
         ) : (
           <span key={i}>{part}</span>
         )
@@ -433,7 +433,7 @@ function ResumeDropZone({ value, onChange }: { value: string; onChange: (text: s
               </button>
               <button
                 onClick={e => { e.stopPropagation(); onChange(""); setUploadMsg("") }}
-                className="text-xs px-2 py-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-[var(--text-muted)] hover:text-red-500 hover:border-red-300 transition-colors shadow-sm"
+                className="text-xs px-2 py-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-[var(--text-muted)] hover:text-[#B6634A] hover:border-[#E3C6BC] transition-colors shadow-sm"
               >
                 ×
               </button>
@@ -454,8 +454,8 @@ function ResumeDropZone({ value, onChange }: { value: string; onChange: (text: s
         }}
       />
 
-      {uploadMsg && <p className="text-xs text-green-600">{uploadMsg}</p>}
-      {uploadError && <p className="text-xs text-red-500">⚠ {uploadError}</p>}
+      {uploadMsg && <p className="text-xs text-[#4F8063]">{uploadMsg}</p>}
+      {uploadError && <p className="text-xs text-[#B6634A]">⚠ {uploadError}</p>}
       {value && <p className="text-xs text-[var(--text-muted)]">{value.length} 字 · 也可直接在上方编辑</p>}
     </div>
   )
@@ -538,9 +538,9 @@ function JDTextArea({ value, onChange }: { value: string; onChange: (text: strin
         )}
       </div>
 
-      {ocrMsg && <p className="text-xs text-green-600">{ocrMsg}</p>}
+      {ocrMsg && <p className="text-xs text-[#4F8063]">{ocrMsg}</p>}
       {ocrError && (
-        <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-start gap-2">
+        <div className="text-xs text-[#876426] bg-[#F2E9D6] border border-[#E1D3AE] rounded-lg px-3 py-2 flex items-start gap-2">
           <span className="shrink-0">⚠</span>
           <span>{ocrError}</span>
         </div>
@@ -566,22 +566,22 @@ function WordCountPanel({ originalCount, rewrittenCount }: {
 
         <div className={`rounded-lg px-3 py-2.5 text-center ${
           rewrittenCount !== null
-            ? diff !== null && diff > 0 ? "bg-green-50 border border-green-200"
-            : diff !== null && diff < 0 ? "bg-blue-50 border border-blue-200"
+            ? diff !== null && diff > 0 ? "bg-[#E3EDE3] border border-[#CBD8C4]"
+            : diff !== null && diff < 0 ? "bg-[#E2EBEC] border border-[#C4D2D4]"
             : "bg-[var(--surface2)]"
             : "bg-[var(--surface2)]"
         }`}>
           <p className="text-xs text-[var(--text-muted)] mb-1">改写后字数</p>
           <p className={`text-lg font-bold ${
             rewrittenCount !== null
-              ? diff !== null && diff > 0 ? "text-green-700"
-              : diff !== null && diff < 0 ? "text-blue-700" : "text-[var(--text-sub)]"
+              ? diff !== null && diff > 0 ? "text-[#3C6B4E]"
+              : diff !== null && diff < 0 ? "text-[#436069]" : "text-[var(--text-sub)]"
               : "text-[var(--border)]"
           }`}>
             {rewrittenCount !== null ? rewrittenCount : "—"}
           </p>
           {diff !== null && (
-            <p className={`text-xs font-medium ${diff > 0 ? "text-green-600" : diff < 0 ? "text-blue-600" : "text-[var(--text-muted)]"}`}>
+            <p className={`text-xs font-medium ${diff > 0 ? "text-[#4F8063]" : diff < 0 ? "text-[#436069]" : "text-[var(--text-muted)]"}`}>
               {diff > 0 ? `+${diff}` : diff === 0 ? "持平" : `${diff}`} 字
             </p>
           )}
@@ -1076,7 +1076,7 @@ function ResumePageInner() {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#1a1a1a] text-white text-sm px-5 py-3 rounded-full shadow-xl animate-fade-in">
           <span>📦</span>
           <span>{libToast}</span>
-          <Link href="/profile" className="text-amber-300 hover:text-amber-200 font-medium whitespace-nowrap">查看素材库 →</Link>
+          <Link href="/profile" className="text-[#E1D3AE] hover:text-[#E1D3AE] font-medium whitespace-nowrap">查看素材库 →</Link>
           <button onClick={() => setLibToast(null)} className="text-white/50 hover:text-white ml-1">×</button>
         </div>
       )}
@@ -1187,9 +1187,9 @@ function ResumePageInner() {
           </div>
 
           {company.trim() && (
-            <div className="flex items-center gap-2 text-xs bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-              <span className="text-green-600">✓</span>
-              <span className="text-green-700">生成后将自动同步到投递看板（{company} · {position || "产品经理"}）</span>
+            <div className="flex items-center gap-2 text-xs bg-[#E3EDE3] border border-[#CBD8C4] rounded-lg px-3 py-2">
+              <span className="text-[#4F8063]">✓</span>
+              <span className="text-[#3C6B4E]">生成后将自动同步到投递看板（{company} · {position || "产品经理"}）</span>
             </div>
           )}
 
@@ -1199,23 +1199,23 @@ function ResumePageInner() {
           {jdText.trim().length > 80 && !jdProfile && (
             <div className="flex items-center gap-3">
               <button onClick={analyzeJD} disabled={analyzingJd}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-60">
+                className="flex items-center gap-2 px-4 py-2 bg-[#E2EBEC] border border-[#C4D2D4] text-[#2E5B54] text-xs font-semibold rounded-lg hover:bg-[#E2EBEC] transition-colors disabled:opacity-60">
                 {analyzingJd ? (
                   <><svg className="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>解读中...</>
                 ) : "🔍 解读这份JD（先看清楚招什么人，再改简历）"}
               </button>
-              {jdProfileError && <p className="text-xs text-red-500">{jdProfileError}</p>}
+              {jdProfileError && <p className="text-xs text-[#B6634A]">{jdProfileError}</p>}
             </div>
           )}
 
           {jdProfile && (
-            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-2.5">
+            <div className="bg-[#E2EBEC] border border-[#C4D2D4] rounded-xl p-4 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2 py-0.5 bg-indigo-600 text-white text-xs font-bold rounded-full">{jdProfile.pm_type}</span>
-                  <span className="px-2 py-0.5 bg-white border border-indigo-200 text-indigo-700 text-xs rounded-full">{jdProfile.experience_level}</span>
+                  <span className="px-2 py-0.5 bg-[#2E5B54] text-white text-xs font-bold rounded-full">{jdProfile.pm_type}</span>
+                  <span className="px-2 py-0.5 bg-white border border-[#C4D2D4] text-[#2E5B54] text-xs rounded-full">{jdProfile.experience_level}</span>
                 </div>
-                <button onClick={() => setJdProfile(null)} className="text-[10px] text-indigo-400 hover:text-indigo-600 shrink-0">关闭</button>
+                <button onClick={() => setJdProfile(null)} className="text-[10px] text-[#5B7E86] hover:text-[#2E5B54] shrink-0">关闭</button>
               </div>
 
               {/* 核心能力维度（精简版：只显示核心+重要） */}
@@ -1224,7 +1224,7 @@ function ResumePageInner() {
                   .filter(d => d.priority === "核心" || d.priority === "重要")
                   .map((d, i) => (
                     <span key={i} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      d.priority === "核心" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                      d.priority === "核心" ? "bg-[#F1E0DA] text-[#9E4631]" : "bg-[#F2E9D6] text-[#876426]"
                     }`}>{d.name}</span>
                   ))}
               </div>
@@ -1232,7 +1232,7 @@ function ResumePageInner() {
               {/* 改写重点 */}
               <div className="flex items-start gap-2">
                 <span className="text-sm shrink-0">💡</span>
-                <p className="text-xs text-indigo-800 font-medium">{jdProfile.rewrite_focus}</p>
+                <p className="text-xs text-[#234B47] font-medium">{jdProfile.rewrite_focus}</p>
               </div>
             </div>
           )}
@@ -1242,16 +1242,16 @@ function ResumePageInner() {
             <div className="space-y-2">
               {!matchResult && (
                 <button onClick={runMatchMaterials} disabled={matchingMaterials}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-60">
+                  className="flex items-center gap-2 px-4 py-2 bg-[#E3EDE3] border border-[#CBD8C4] text-[#3C6B4E] text-xs font-semibold rounded-lg hover:bg-[#CBD8C4] transition-colors disabled:opacity-60">
                   {matchingMaterials ? (
                     <><svg className="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>匹配中...</>
                   ) : "🎯 推荐匹配经历（从素材库挑出最适合这份JD的经历）"}
                 </button>
               )}
-              {matchError && <p className="text-xs text-red-500">{matchError}</p>}
+              {matchError && <p className="text-xs text-[#B6634A]">{matchError}</p>}
 
               {matchResult && matchResult.empty && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center space-y-2">
+                <div className="bg-[#E3EDE3] border border-[#CBD8C4] rounded-xl p-4 text-center space-y-2">
                   <p className="text-sm font-medium text-[var(--text-main)]">素材库还没有经历可推荐</p>
                   <p className="text-xs text-[var(--text-muted)]">先去添加实习 / 项目经历，下次粘 JD 就能自动推荐最匹配的经历</p>
                   <Link href="/profile" className="inline-block mt-1 px-4 py-1.5 bg-[var(--primary)] text-white text-xs rounded-lg font-medium hover:opacity-90 transition-opacity">去建立素材库 →</Link>
@@ -1259,10 +1259,10 @@ function ResumePageInner() {
               )}
 
               {matchResult && !matchResult.empty && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2.5">
+                <div className="bg-[#E3EDE3] border border-[#CBD8C4] rounded-xl p-4 space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-emerald-700">🎯 匹配经历推荐（按匹配度排序）</p>
-                    <button onClick={() => { setMatchResult(null); setAddedExp(new Set()) }} className="text-[10px] text-emerald-500 hover:text-emerald-700 shrink-0">重新推荐</button>
+                    <p className="text-xs font-bold text-[#3C6B4E]">🎯 匹配经历推荐（按匹配度排序）</p>
+                    <button onClick={() => { setMatchResult(null); setAddedExp(new Set()) }} className="text-[10px] text-[#4F8063] hover:text-[#3C6B4E] shrink-0">重新推荐</button>
                   </div>
 
                   {matchResult.internships.map(rec => {
@@ -1271,14 +1271,14 @@ function ResumePageInner() {
                     const key = "i-" + rec.id
                     const added = addedExp.has(key)
                     return (
-                      <div key={key} className="bg-white border border-emerald-100 rounded-lg px-3 py-2.5 flex items-start gap-3">
-                        <span className={`shrink-0 text-xs font-bold px-2 py-0.5 rounded-full ${rec.match === "高" ? "bg-red-100 text-red-700" : rec.match === "中" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-500"}`}>{rec.match}</span>
+                      <div key={key} className="bg-white border border-[#CBD8C4] rounded-lg px-3 py-2.5 flex items-start gap-3">
+                        <span className={`shrink-0 text-xs font-bold px-2 py-0.5 rounded-full ${rec.match === "高" ? "bg-[#F1E0DA] text-[#9E4631]" : rec.match === "中" ? "bg-[#F2E9D6] text-[#876426]" : "bg-gray-100 text-gray-500"}`}>{rec.match}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-semibold text-[var(--text-main)]">实习 · {exp.company} · {exp.position}</p>
                           <p className="text-xs text-[var(--text-muted)] mt-0.5">{rec.reason}</p>
                         </div>
                         <button onClick={() => addExperienceToResume(internToText(exp), key)} disabled={added}
-                          className={`shrink-0 text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${added ? "text-green-600" : "bg-[var(--primary)] text-white hover:opacity-90"}`}>
+                          className={`shrink-0 text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${added ? "text-[#4F8063]" : "bg-[var(--primary)] text-white hover:opacity-90"}`}>
                           {added ? "已加入 ✓" : "＋ 加入简历"}
                         </button>
                       </div>
@@ -1291,14 +1291,14 @@ function ResumePageInner() {
                     const key = "p-" + rec.id
                     const added = addedExp.has(key)
                     return (
-                      <div key={key} className="bg-white border border-emerald-100 rounded-lg px-3 py-2.5 flex items-start gap-3">
-                        <span className={`shrink-0 text-xs font-bold px-2 py-0.5 rounded-full ${rec.match === "高" ? "bg-red-100 text-red-700" : rec.match === "中" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-500"}`}>{rec.match}</span>
+                      <div key={key} className="bg-white border border-[#CBD8C4] rounded-lg px-3 py-2.5 flex items-start gap-3">
+                        <span className={`shrink-0 text-xs font-bold px-2 py-0.5 rounded-full ${rec.match === "高" ? "bg-[#F1E0DA] text-[#9E4631]" : rec.match === "中" ? "bg-[#F2E9D6] text-[#876426]" : "bg-gray-100 text-gray-500"}`}>{rec.match}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-semibold text-[var(--text-main)]">项目 · {exp.name} · {exp.role}</p>
                           <p className="text-xs text-[var(--text-muted)] mt-0.5">{rec.reason}</p>
                         </div>
                         <button onClick={() => addExperienceToResume(projectToText(exp), key)} disabled={added}
-                          className={`shrink-0 text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${added ? "text-green-600" : "bg-[var(--primary)] text-white hover:opacity-90"}`}>
+                          className={`shrink-0 text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${added ? "text-[#4F8063]" : "bg-[var(--primary)] text-white hover:opacity-90"}`}>
                           {added ? "已加入 ✓" : "＋ 加入简历"}
                         </button>
                       </div>
@@ -1311,16 +1311,16 @@ function ResumePageInner() {
             </div>
           )}
 
-          <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
-            <p className="text-xs font-semibold text-blue-700 mb-1.5">如何粘贴 JD 截图？</p>
-            <ol className="text-xs text-blue-600 space-y-1 list-decimal list-inside">
-              <li>在浏览器/APP中对JD页面截图（Win: <kbd className="bg-blue-100 px-1 rounded">Win+Shift+S</kbd>，Mac: <kbd className="bg-blue-100 px-1 rounded">Cmd+Shift+4</kbd>）</li>
-              <li>点击上方JD输入框，按 <kbd className="bg-blue-100 px-1 rounded">Ctrl+V</kbd> / <kbd className="bg-blue-100 px-1 rounded">Cmd+V</kbd> 粘贴</li>
+          <div className="bg-[#E2EBEC] border border-[#E2EBEC] rounded-lg px-4 py-3">
+            <p className="text-xs font-semibold text-[#436069] mb-1.5">如何粘贴 JD 截图？</p>
+            <ol className="text-xs text-[#436069] space-y-1 list-decimal list-inside">
+              <li>在浏览器/APP中对JD页面截图（Win: <kbd className="bg-[#E2EBEC] px-1 rounded">Win+Shift+S</kbd>，Mac: <kbd className="bg-[#E2EBEC] px-1 rounded">Cmd+Shift+4</kbd>）</li>
+              <li>点击上方JD输入框，按 <kbd className="bg-[#E2EBEC] px-1 rounded">Ctrl+V</kbd> / <kbd className="bg-[#E2EBEC] px-1 rounded">Cmd+V</kbd> 粘贴</li>
               <li>AI 自动识别截图中的文字并填入（需配置支持图片识别的模型）</li>
             </ol>
           </div>
 
-          {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+          {error && <p className="text-sm text-[#B6634A] bg-[#F1E0DA] rounded-lg px-3 py-2">{error}</p>}
 
           <div className="flex items-center gap-3 flex-wrap">
             <span className="text-sm text-[var(--text-sub)]">改写力度：</span>
@@ -1381,12 +1381,12 @@ function ResumePageInner() {
                 {company || "通用版"}{position ? ` · ${position}` : ""}
               </span>
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                mode === "light" ? "bg-blue-50 text-blue-600" : "bg-orange-50 text-orange-600"
+                mode === "light" ? "bg-[#E2EBEC] text-[#436069]" : "bg-[#F1E0DA] text-[#9E4631]"
               }`}>
                 {mode === "light" ? "轻修" : "精修"}
               </span>
               {autoSynced && (
-                <span className="flex items-center gap-1 text-xs text-green-600">
+                <span className="flex items-center gap-1 text-xs text-[#4F8063]">
                   <span>✓</span> 已同步到投递看板
                   <a href="/tracker" className="underline hover:no-underline ml-1">查看</a>
                 </span>
@@ -1404,7 +1404,7 @@ function ResumePageInner() {
                 </select>
               )}
               {versionSaved ? (
-                <span className="text-xs text-green-600 font-medium">
+                <span className="text-xs text-[#4F8063] font-medium">
                   已保存 ✓{linkedAppId && applications.find(a => a.id === Number(linkedAppId)) &&
                     ` → ${applications.find(a => a.id === Number(linkedAppId))!.company}`}
                 </span>
@@ -1515,7 +1515,7 @@ function ResumePageInner() {
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {result.skills.map((s, i) => (
-                          <span key={i} className="text-xs px-2 py-1 bg-yellow-100 text-yellow-900 rounded-full font-medium border border-yellow-200">
+                          <span key={i} className="text-xs px-2 py-1 bg-[#F5EAD0] text-[#876426] rounded-full font-medium border border-[#E1D3AE]">
                             {s.after}
                           </span>
                         ))}
@@ -1540,15 +1540,15 @@ function ResumePageInner() {
               )}
 
               {/* 面试官视角分析 */}
-              <div data-shot="score" className="bg-[var(--surface)] border-2 border-indigo-200 rounded-xl overflow-hidden">
-                <div className="px-5 py-3 bg-indigo-50 border-b border-indigo-200 flex items-center justify-between">
+              <div data-shot="score" className="bg-[var(--surface)] border-2 border-[#C4D2D4] rounded-xl overflow-hidden">
+                <div className="px-5 py-3 bg-[#E2EBEC] border-b border-[#C4D2D4] flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-indigo-900">面试官视角分析</h3>
-                    <p className="text-xs text-indigo-500 mt-0.5">AI 扮演面试官，找出简历薄弱点和可能被追问的地方</p>
+                    <h3 className="text-sm font-bold text-[#20302D]">面试官视角分析</h3>
+                    <p className="text-xs text-[#5B7E86] mt-0.5">AI 扮演面试官，找出简历薄弱点和可能被追问的地方</p>
                   </div>
                   {!interviewerAnalysis && (
                     <button onClick={runInterviewerAnalysis} disabled={loadingAnalysis}
-                      className="px-4 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-60 flex items-center gap-1.5 shrink-0">
+                      className="px-4 py-1.5 bg-[#2E5B54] text-white text-xs font-semibold rounded-lg hover:bg-[#2E5B54] transition-colors disabled:opacity-60 flex items-center gap-1.5 shrink-0">
                       {loadingAnalysis ? (
                         <>
                           <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
@@ -1561,7 +1561,7 @@ function ResumePageInner() {
                     </button>
                   )}
                   {interviewerAnalysis && (
-                    <button onClick={() => setInterviewerAnalysis(null)} className="text-xs text-indigo-400 hover:text-indigo-600">重新分析</button>
+                    <button onClick={() => setInterviewerAnalysis(null)} className="text-xs text-[#5B7E86] hover:text-[#2E5B54]">重新分析</button>
                   )}
                 </div>
 
@@ -1570,7 +1570,7 @@ function ResumePageInner() {
                     <p className="text-sm text-[var(--text-muted)]">
                       {jdText.trim() ? "点击「开始分析」，AI 将对照 JD 找出薄弱点和可能被追问的地方" : "建议先在 Step2 填写 JD，分析结果会更精准"}
                     </p>
-                    {analysisError && <p className="text-xs text-red-600 mt-2">{analysisError}</p>}
+                    {analysisError && <p className="text-xs text-[#B6634A] mt-2">{analysisError}</p>}
                   </div>
                 )}
 
@@ -1585,16 +1585,16 @@ function ResumePageInner() {
                           <div className="flex items-start gap-4 mb-3">
                             <div className="text-center">
                               <div className={`text-3xl font-bold leading-none ${
-                                interviewerAnalysis.overall_score >= 80 ? "text-green-600" :
-                                interviewerAnalysis.overall_score >= 65 ? "text-amber-600" :
-                                interviewerAnalysis.overall_score >= 50 ? "text-orange-600" : "text-red-600"
+                                interviewerAnalysis.overall_score >= 80 ? "text-[#4F8063]" :
+                                interviewerAnalysis.overall_score >= 65 ? "text-[#876426]" :
+                                interviewerAnalysis.overall_score >= 50 ? "text-[#9E4631]" : "text-[#B6634A]"
                               }`}>
                                 {interviewerAnalysis.overall_score}
                               </div>
                               <div className={`text-[10px] font-bold mt-1 px-1.5 py-0.5 rounded ${
-                                interviewerAnalysis.overall_score >= 80 ? "bg-green-100 text-green-700" :
-                                interviewerAnalysis.overall_score >= 65 ? "bg-amber-100 text-amber-700" :
-                                interviewerAnalysis.overall_score >= 50 ? "bg-orange-100 text-orange-700" : "bg-red-100 text-red-700"
+                                interviewerAnalysis.overall_score >= 80 ? "bg-[#E3EDE3] text-[#3C6B4E]" :
+                                interviewerAnalysis.overall_score >= 65 ? "bg-[#F2E9D6] text-[#876426]" :
+                                interviewerAnalysis.overall_score >= 50 ? "bg-[#F1E0DA] text-[#9E4631]" : "bg-[#F1E0DA] text-[#9E4631]"
                               }`}>
                                 {interviewerAnalysis.overall_score >= 80 ? "优秀" :
                                  interviewerAnalysis.overall_score >= 65 ? "良好" :
@@ -1614,21 +1614,21 @@ function ResumePageInner() {
                                 const weak    = interviewerAnalysis.match_items?.filter(i => i.resume_status === "weak").length    ?? 0
                                 const missing = interviewerAnalysis.match_items?.filter(i => i.resume_status === "missing").length ?? 0
                                 return <>
-                                  <span className="flex items-center gap-1"><span className="text-green-600 font-bold">✅ {strong}</span><span className="text-[var(--text-muted)]">项命中</span></span>
-                                  <span className="flex items-center gap-1"><span className="text-amber-600 font-bold">⚠️ {weak}</span><span className="text-[var(--text-muted)]">项较弱</span></span>
-                                  <span className="flex items-center gap-1"><span className="text-red-500 font-bold">❌ {missing}</span><span className="text-[var(--text-muted)]">项缺失</span></span>
+                                  <span className="flex items-center gap-1"><span className="text-[#4F8063] font-bold">✅ {strong}</span><span className="text-[var(--text-muted)]">项命中</span></span>
+                                  <span className="flex items-center gap-1"><span className="text-[#876426] font-bold">⚠️ {weak}</span><span className="text-[var(--text-muted)]">项较弱</span></span>
+                                  <span className="flex items-center gap-1"><span className="text-[#B6634A] font-bold">❌ {missing}</span><span className="text-[var(--text-muted)]">项缺失</span></span>
                                   <span className="text-[var(--text-muted)] border-l border-[var(--border)] pl-3">基于JD核心维度覆盖率综合计算</span>
                                 </>
                               })()}
                             </div>
                             <div className="mt-2 flex items-center gap-2 text-[10px] text-[var(--text-muted)]">
-                              <span className="bg-green-100 text-green-700 px-1 rounded">80+优秀</span>
+                              <span className="bg-[#E3EDE3] text-[#3C6B4E] px-1 rounded">80+优秀</span>
                               <span className="text-[var(--border)]">·</span>
-                              <span className="bg-amber-100 text-amber-700 px-1 rounded">65–79良好</span>
+                              <span className="bg-[#F2E9D6] text-[#876426] px-1 rounded">65–79良好</span>
                               <span className="text-[var(--border)]">·</span>
-                              <span className="bg-orange-100 text-orange-700 px-1 rounded">50–64合格</span>
+                              <span className="bg-[#F1E0DA] text-[#9E4631] px-1 rounded">50–64合格</span>
                               <span className="text-[var(--border)]">·</span>
-                              <span className="bg-red-100 text-red-700 px-1 rounded">&lt;50待提升</span>
+                              <span className="bg-[#F1E0DA] text-[#9E4631] px-1 rounded">&lt;50待提升</span>
                             </div>
                           </div>
                         </div>
@@ -1639,17 +1639,17 @@ function ResumePageInner() {
                             <div className="space-y-2">
                               {interviewerAnalysis.match_items.map((item, i) => (
                                 <div key={i} className={`rounded-lg px-3 py-2.5 border ${
-                                  item.resume_status === "strong" ? "bg-green-50 border-green-200" :
-                                  item.resume_status === "weak"   ? "bg-amber-50 border-amber-200" :
-                                                                     "bg-red-50 border-red-200"
+                                  item.resume_status === "strong" ? "bg-[#E3EDE3] border-[#CBD8C4]" :
+                                  item.resume_status === "weak"   ? "bg-[#F2E9D6] border-[#E1D3AE]" :
+                                                                     "bg-[#F1E0DA] border-[#E3C6BC]"
                                 }`}>
                                   <div className="flex items-center gap-2 mb-1">
                                     <span className="text-base">{item.resume_status === "strong" ? "✅" : item.resume_status === "weak" ? "⚠️" : "❌"}</span>
                                     <span className="text-sm font-semibold text-[var(--text-main)]">{item.aspect}</span>
                                     <span className={`text-xs px-1.5 py-0.5 rounded font-medium ml-auto ${
-                                      item.resume_status === "strong" ? "bg-green-100 text-green-700" :
-                                      item.resume_status === "weak"   ? "bg-amber-100 text-amber-700" :
-                                                                         "bg-red-100 text-red-700"
+                                      item.resume_status === "strong" ? "bg-[#E3EDE3] text-[#3C6B4E]" :
+                                      item.resume_status === "weak"   ? "bg-[#F2E9D6] text-[#876426]" :
+                                                                         "bg-[#F1E0DA] text-[#9E4631]"
                                     }`}>
                                       {item.resume_status === "strong" ? "命中" : item.resume_status === "weak" ? "较弱" : "缺失"}
                                     </span>
@@ -1672,7 +1672,7 @@ function ResumePageInner() {
                                 <div key={i} className="bg-[var(--surface2)] border border-[var(--border)] rounded-lg p-3">
                                   <p className="text-xs text-[var(--text-muted)] mb-1 font-medium">简历原文：<span className="text-[var(--text-sub)]">「{q.bullet}」</span></p>
                                   <p className="text-sm text-[var(--text-main)] mb-1">面试官可能追问：<strong>{q.question}</strong></p>
-                                  <p className={`text-xs font-medium ${q.can_answer ? "text-green-600" : "text-red-600"}`}>
+                                  <p className={`text-xs font-medium ${q.can_answer ? "text-[#4F8063]" : "text-[#B6634A]"}`}>
                                     {q.can_answer ? "✓ 你的简历可以支撑这个回答" : "⚠ 你的简历目前无法支撑这个回答，建议补充"}
                                   </p>
                                 </div>
@@ -1685,20 +1685,20 @@ function ResumePageInner() {
                           <div className="grid grid-cols-2 gap-3">
                             {interviewerAnalysis.strong_signals?.length > 0 && (
                               <div>
-                                <p className="text-xs font-bold text-green-600 mb-2">强信号词（保留）</p>
+                                <p className="text-xs font-bold text-[#4F8063] mb-2">强信号词（保留）</p>
                                 <div className="flex flex-wrap gap-1.5">
                                   {interviewerAnalysis.strong_signals.map((s, i) => (
-                                    <span key={i} className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded-full border border-green-200">{s}</span>
+                                    <span key={i} className="text-xs px-2 py-1 bg-[#E3EDE3] text-[#3C6B4E] rounded-full border border-[#CBD8C4]">{s}</span>
                                   ))}
                                 </div>
                               </div>
                             )}
                             {interviewerAnalysis.weak_signals?.length > 0 && (
                               <div>
-                                <p className="text-xs font-bold text-amber-600 mb-2">空话/弱信号词（考虑删除）</p>
+                                <p className="text-xs font-bold text-[#876426] mb-2">空话/弱信号词（考虑删除）</p>
                                 <div className="flex flex-wrap gap-1.5">
                                   {interviewerAnalysis.weak_signals.map((s, i) => (
-                                    <span key={i} className="text-xs px-2 py-1 bg-amber-50 text-amber-700 rounded-full border border-amber-200 line-through">{s}</span>
+                                    <span key={i} className="text-xs px-2 py-1 bg-[#F2E9D6] text-[#876426] rounded-full border border-[#E1D3AE] line-through">{s}</span>
                                   ))}
                                 </div>
                               </div>
