@@ -700,6 +700,8 @@ function ResumeMatchIllustration() {
 
 function ResumePageInner() {
   const [step, setStep] = useState<1 | 2 | 3>(1)
+  // 单屏模式:输入区是否展开(生成后收成一行,可展开重改)
+  const [showInput, setShowInput] = useState(true)
   const [step1Mode, setStep1Mode] = useState<"upload" | "library">("upload")
   const [resumeText, setResumeText] = useState("")
   const [jdText, setJdText] = useState("")
@@ -841,6 +843,7 @@ function ResumePageInner() {
     // 如果有 version_id 参数，跳到 step 3 并还原当时的对比界面
     if (v) {
       setStep(3)
+      setShowInput(false)
       restoreVersion(Number(v))
     }
   }, [])  // eslint-disable-line
@@ -978,6 +981,8 @@ function ResumePageInner() {
       setRewrittenWordCount(calcRewrittenCount(data))
       setVersionSaved(false)
       setStep(3)
+      setShowInput(false)      // 生成后输入区收起
+      syncToLibrary(resumeText) // 顺带把基础简历同步进素材库(原「去匹配JD」时做的)
       persistTagMatch()
       if (company.trim() && !autoSynced) {
         const appId = await autoSyncToTracker(company, position)
@@ -1169,39 +1174,23 @@ function ResumePageInner() {
         </div>
       </div>
 
-      {/* 步骤指示器 */}
-      <div className="flex items-center gap-2 mb-6">
-        {[
-          { num: 1, label: "基础简历" },
-          { num: 2, label: "目标 JD" },
-          { num: 3, label: "生成版本" },
-        ].map((s, idx) => (
-          <div key={s.num} className="flex items-center gap-2">
-            <button
-              onClick={() => step > s.num && setStep(s.num as 1|2|3)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors ${
-                step === s.num
-                  ? "bg-[var(--primary)] text-white font-semibold"
-                  : step > s.num
-                  ? "bg-[var(--surface2)] text-[var(--text-sub)] cursor-pointer hover:bg-[var(--border)]"
-                  : "bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] cursor-not-allowed"
-              }`}
-            >
-              <span className={`w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center ${
-                step === s.num ? "bg-white text-[var(--primary)]" :
-                step > s.num  ? "bg-[var(--primary)] text-white" :
-                "bg-[var(--border)] text-[var(--text-muted)]"
-              }`}>{step > s.num ? "✓" : s.num}</span>
-              {s.label}
-            </button>
-            {idx < 2 && <span className="text-[var(--border)] text-sm">→</span>}
-          </div>
-        ))}
-      </div>
+      {/* 生成后:输入区收成一行(可展开重改) */}
+      {!showInput && (
+        <button onClick={() => setShowInput(true)}
+          className="w-full flex items-center justify-between gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-3 mb-4 text-left hover:border-[var(--primary)]/40 transition-colors">
+          <span className="text-sm text-[var(--text-sub)] truncate">
+            <span className="font-semibold text-[var(--text-main)]">已生成适配版本</span>
+            <span className="mx-2 text-[var(--text-muted)]">·</span>
+            {company ? `${company}${position ? " · " + position : ""}` : "通用版"} · 简历 {resumeText.length} 字{jdText.trim() ? " · JD 已填" : ""}
+          </span>
+          <span className="text-xs text-[var(--primary)] font-medium shrink-0">展开重改 ⌄</span>
+        </button>
+      )}
 
-      {/* Step 1：上传简历 */}
-      {step === 1 && (
+      {/* ① 基础简历(单屏) */}
+      {showInput && (
         <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
+          <p className="text-sm font-semibold text-[var(--text-main)] mb-3"><span className="text-[var(--primary)]">①</span> 你的基础简历</p>
           {/* 来源 tab 切换 */}
           <div className="flex gap-1 mb-4 bg-[var(--surface2)] rounded-lg p-1 w-fit">
             {([["upload", "📄 粘贴 / 上传"], ["library", "📦 从素材库导入"]] as const).map(([key, label]) => (
@@ -1223,25 +1212,14 @@ function ResumePageInner() {
             <MaterialImporter onImport={text => { handleResumeChange(text); setStep1Mode("upload") }} />
           )}
 
-          <div className="mt-4 flex items-center justify-between">
-            <div className="text-xs text-[var(--text-muted)] space-y-0.5">
-              <p>支持 PDF / Word / TXT 拖拽上传，也可直接在框内粘贴文字</p>
-              <p>建议上传文字版 PDF（扫描件可能无法提取文字）</p>
-            </div>
-            <button
-              onClick={() => { if (resumeText.trim()) { setStep(2); syncToLibrary(resumeText) } }}
-              disabled={!resumeText.trim()}
-              className="px-5 py-2 bg-[var(--primary)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
-            >
-              去匹配 JD →
-            </button>
-          </div>
+          <p className="mt-3 text-xs text-[var(--text-muted)]">支持 PDF / Word / TXT 拖拽上传，也可直接在框内粘贴文字（扫描件可能无法提取文字）</p>
         </div>
       )}
 
-      {/* Step 2：输入 JD */}
-      {step === 2 && (
-        <div data-shot="jd" className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
+      {/* ② 目标 JD + 生成(单屏) */}
+      {showInput && (
+        <div data-shot="jd" className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4 mt-4">
+          <p className="text-sm font-semibold text-[var(--text-main)]"><span className="text-[var(--primary)]">②</span> 目标岗位 JD <span className="text-xs font-normal text-[var(--text-muted)]">（选填，填了改写更有针对性）</span></p>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-[var(--text-muted)] mb-1 block">目标公司</label>
@@ -1380,15 +1358,6 @@ function ResumePageInner() {
             </div>
           )}
 
-          <div className="bg-[#E2EBEC] border border-[#E2EBEC] rounded-lg px-4 py-3">
-            <p className="text-xs font-semibold text-[#436069] mb-1.5">如何粘贴 JD 截图？</p>
-            <ol className="text-xs text-[#436069] space-y-1 list-decimal list-inside">
-              <li>在浏览器/APP中对JD页面截图（Win: <kbd className="bg-[#E2EBEC] px-1 rounded">Win+Shift+S</kbd>，Mac: <kbd className="bg-[#E2EBEC] px-1 rounded">Cmd+Shift+4</kbd>）</li>
-              <li>点击上方JD输入框，按 <kbd className="bg-[#E2EBEC] px-1 rounded">Ctrl+V</kbd> / <kbd className="bg-[#E2EBEC] px-1 rounded">Cmd+V</kbd> 粘贴</li>
-              <li>AI 自动识别截图中的文字并填入（需配置支持图片识别的模型）</li>
-            </ol>
-          </div>
-
           {error && <p className="text-sm text-[#B6634A] bg-[#F1E0DA] rounded-lg px-3 py-2">{error}</p>}
 
           <div className="flex items-center gap-3 flex-wrap">
@@ -1418,30 +1387,14 @@ function ResumePageInner() {
                   </svg>
                   AI 改写中...
                 </>
-              ) : "生成改写结果"}
+              ) : "生成适配版本 →"}
             </button>
-          </div>
-
-          {/* 改写方法论说明 */}
-          <div className="text-xs text-[var(--text-muted)] border border-[var(--border)] rounded-lg px-4 py-3 space-y-1.5">
-            <p className="font-semibold text-[var(--text-sub)]">改写逻辑说明</p>
-            <p>
-              <span className="font-medium text-[var(--text-main)]">总领句结果先行</span>
-              ：HR 筛简历时只扫第一句话，「完成了什么」比「负责了什么」更有说服力。把交付物和覆盖范围放到句首，而不是动词。
-            </p>
-            <p>
-              <span className="font-medium text-[var(--text-main)]">要点加一句背景</span>
-              ：说明你在解决什么问题，让每段经历有独特性，避免「换个名字也能贴」的空洞描述。这是 STAR 里 Situation 的压缩版。
-            </p>
-            <p className="text-[var(--text-muted)]">
-              完整 STAR 方法写下来需要 100+ 字，简历版面放不下。这里取「背景一句 + 行动 + 结果」的精简结构，保留逻辑链条的同时适配快速筛选场景。
-            </p>
           </div>
         </div>
       )}
 
-      {/* Step 3：双栏对比 */}
-      {step === 3 && (
+      {/* 适配结果:双栏对比(有结果即显示) */}
+      {result && (
         <div className="space-y-4">
           {/* 顶部状态栏 */}
           <div className="flex items-center justify-between bg-[var(--surface)] border border-[var(--border)] rounded-xl px-5 py-3">
@@ -1484,7 +1437,7 @@ function ResumePageInner() {
                 </button>
               )}
               <button
-                onClick={() => { setStep(2); setResult(null); setVersionSaved(false); setAutoSynced(false); setJdProfile(null) }}
+                onClick={() => { setShowInput(true); setResult(null); setVersionSaved(false); setAutoSynced(false); setJdProfile(null); setCompany(""); setPosition(""); setJdText("") }}
                 className="px-3 py-1.5 text-xs border border-[var(--border)] text-[var(--text-sub)] rounded-lg hover:bg-[var(--surface2)] transition-colors">
                 换一家公司
               </button>
