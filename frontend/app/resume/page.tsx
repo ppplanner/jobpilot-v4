@@ -321,21 +321,45 @@ function VersionHistoryPanel({ refreshKey, autoExpandVersionId }: { refreshKey: 
   )
 }
 
+// 字符级 LCS diff:只高亮"改写后相对原文新增/改动"的片段。
+// 中文没有空格,旧的按空格分词会把整句判为"新增"→全被标黄,这里按字符对齐修正。
 function diffHighlight(original: string, rewritten: string): React.ReactNode {
-  const origWords = new Set(original.split(/\s+/).filter(Boolean))
-  const parts = rewritten.split(/(\s+)/)
-  return (
-    <>
-      {parts.map((part, i) => {
-        const isNew = part.trim() && !origWords.has(part.trim())
-        return isNew ? (
-          <mark key={i} className="bg-[#F5EAD0] text-[#876426] rounded px-0.5 not-italic">{part}</mark>
-        ) : (
-          <span key={i}>{part}</span>
-        )
-      })}
-    </>
-  )
+  const a = original || "", b = rewritten || ""
+  const n = a.length, m = b.length
+  // 太长则不做 diff(避免 O(n*m) 过大),直接原样显示
+  if (n === 0 || n > 1500 || m > 1500) return <>{b}</>
+
+  // LCS 长度表
+  const dp: number[][] = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0))
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1])
+
+  // 回溯:b 中落在公共子序列上的字符=保留,其余=新增
+  const isNew: boolean[] = new Array(m).fill(true)
+  let i = 0, j = 0
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { isNew[j] = false; i++; j++ }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) i++
+    else j++
+  }
+
+  // 合并连续同类片段
+  const nodes: React.ReactNode[] = []
+  let buf = "", flag = m > 0 ? isNew[0] : false, key = 0
+  const flush = () => {
+    if (!buf) return
+    nodes.push(flag
+      ? <mark key={key++} className="bg-[#F5EAD0] text-[#876426] rounded px-0.5 not-italic">{buf}</mark>
+      : <span key={key++}>{buf}</span>)
+    buf = ""
+  }
+  for (let k = 0; k < m; k++) {
+    if (isNew[k] !== flag) { flush(); flag = isNew[k] }
+    buf += b[k]
+  }
+  flush()
+  return <>{nodes}</>
 }
 
 function ResumeDropZone({ value, onChange }: { value: string; onChange: (text: string) => void }) {
@@ -685,6 +709,51 @@ function ResumePageInner() {
   const [result, setResult] = useState<RewriteResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  // 最终界面:单个模块快速编辑
+  const [editKey, setEditKey] = useState<string | null>(null)
+  const [editText, setEditText] = useState("")
+  const updateModule = (kind: "internships" | "projects", idx: number, val: string) => {
+    setResult(prev => {
+      if (!prev) return prev
+      const arr = [...prev[kind]]
+      arr[idx] = { ...arr[idx], rewritten: val }
+      return { ...prev, [kind]: arr }
+    })
+    setEditKey(null)
+  }
+  // 改写结果单元格(可就地编辑单个模块)。作为"函数调用"而非组件,避免输入时重挂丢焦点。
+  const renderRewriteCell = (ek: string, kind: "internships" | "projects", idx: number, original: string, rewritten: string, note: string): React.ReactNode => (
+    <div className="p-4 bg-[#FFFDF9]">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs text-[var(--primary)] font-medium flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] inline-block" /> 改写结果
+        </p>
+        {editKey !== ek && (
+          <button onClick={() => { setEditKey(ek); setEditText(rewritten) }}
+            className="text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors">编辑</button>
+        )}
+      </div>
+      {editKey === ek ? (
+        <>
+          <textarea value={editText} onChange={e => setEditText(e.target.value)} rows={5} autoFocus
+            className="w-full text-sm text-[var(--text-main)] leading-relaxed border border-[var(--primary)]/40 rounded-lg p-2 bg-white outline-none resize-y" />
+          <div className="flex gap-2 mt-2">
+            <button onClick={() => updateModule(kind, idx, editText)}
+              className="px-3 py-1 bg-[var(--primary)] text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity">保存</button>
+            <button onClick={() => setEditKey(null)}
+              className="px-3 py-1 border border-[var(--border)] text-[var(--text-sub)] text-xs rounded-lg hover:bg-[var(--surface2)] transition-colors">取消</button>
+          </div>
+        </>
+      ) : (
+        <p className="text-sm text-[var(--text-main)] leading-relaxed whitespace-pre-wrap">
+          {diffHighlight(original, rewritten)}
+        </p>
+      )}
+      {note && (
+        <p className="text-xs text-[var(--text-muted)] mt-2 pt-2 border-t border-[var(--border)] italic">💡 {note}</p>
+      )}
+    </div>
+  )
 
   const [originalWordCount, setOriginalWordCount] = useState(0)
   const [rewrittenWordCount, setRewrittenWordCount] = useState<number | null>(null)
@@ -1085,10 +1154,10 @@ function ResumePageInner() {
           style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "22px 22px" }} />
         <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div className="max-w-xl">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">JD Resume Matching Workspace</p>
-            <h1 className="text-2xl font-bold leading-tight mb-3">转行新人多 JD 简历适配台</h1>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Career Switch · Resume Matching</p>
+            <h1 className="text-2xl font-bold leading-tight mb-3">转行进互联网 · 简历适配台</h1>
             <p className="text-sm leading-6 text-white/78">
-              保留一份基础简历，针对不同岗位快速拆解 JD 要求、匹配素材经历，并生成可投递的定制版本。
+              专为转行进互联网的人：留一份基础简历，针对每个目标岗位拆解 JD、匹配你的经历，生成一份能投的定制版本。
             </p>
             <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
               <span className="rounded-full bg-white/12 px-3 py-1 text-white/85">能力标签对齐</span>
@@ -1444,19 +1513,7 @@ function ResumePageInner() {
                       </p>
                       <p className="text-sm text-[var(--text-sub)] leading-relaxed whitespace-pre-wrap">{item.original}</p>
                     </div>
-                    <div className="p-4 bg-[#FFFDF9]">
-                      <p className="text-xs text-[var(--primary)] font-medium mb-2 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] inline-block"/> 改写结果
-                      </p>
-                      <p className="text-sm text-[var(--text-main)] leading-relaxed whitespace-pre-wrap">
-                        {diffHighlight(item.original, item.rewritten)}
-                      </p>
-                      {item.note && (
-                        <p className="text-xs text-[var(--text-muted)] mt-2 pt-2 border-t border-[var(--border)] italic">
-                          💡 {item.note}
-                        </p>
-                      )}
-                    </div>
+                    {renderRewriteCell(`int-${i}`, "internships", i, item.original, item.rewritten, item.note)}
                   </div>
                 </div>
               ))}
@@ -1474,19 +1531,7 @@ function ResumePageInner() {
                       </p>
                       <p className="text-sm text-[var(--text-sub)] leading-relaxed whitespace-pre-wrap">{item.original}</p>
                     </div>
-                    <div className="p-4 bg-[#FFFDF9]">
-                      <p className="text-xs text-[var(--primary)] font-medium mb-2 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] inline-block"/> 改写结果
-                      </p>
-                      <p className="text-sm text-[var(--text-main)] leading-relaxed whitespace-pre-wrap">
-                        {diffHighlight(item.original, item.rewritten)}
-                      </p>
-                      {item.note && (
-                        <p className="text-xs text-[var(--text-muted)] mt-2 pt-2 border-t border-[var(--border)] italic">
-                          💡 {item.note}
-                        </p>
-                      )}
-                    </div>
+                    {renderRewriteCell(`proj-${i}`, "projects", i, item.original, item.rewritten, item.note)}
                   </div>
                 </div>
               ))}

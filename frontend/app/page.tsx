@@ -1429,9 +1429,9 @@ export default function HomePage() {
         </div>
         <span className="pointer-events-none absolute right-4 bottom-3 font-mono text-[10px] tracking-[0.2em] text-white/40">R-01</span>
         <div className="relative max-w-md">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">Resume Adaptation Blueprint</p>
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">Career Switch · Resume Blueprint</p>
           <p className="text-base text-white/90 leading-relaxed mb-5">
-            把一份基础简历当作底图，叠上你的能力与目标 JD 的要求，生成这一岗位该强调、该补齐、该重写的版本。
+            转行进互联网？把一份基础简历当作底图，叠上你的能力与目标 JD 的要求，生成这一岗位该强调、该补齐、该重写的版本。
           </p>
           <Link href="/resume"
             className="inline-flex items-center gap-1 bg-[var(--accent)] text-[var(--hero)] px-4 py-2 rounded-lg text-xs font-semibold hover:brightness-95 transition-all">
