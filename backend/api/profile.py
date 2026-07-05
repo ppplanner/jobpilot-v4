@@ -34,6 +34,9 @@ class BasicInfoUpdate(BaseModel):
     target_role: Optional[str] = None
     target_city: Optional[str] = None
     self_intro: Optional[str] = None
+    target_side: Optional[str] = None
+    target_direction: Optional[str] = None
+    target_industry: Optional[str] = None
 
 
 @router.put("/basic")

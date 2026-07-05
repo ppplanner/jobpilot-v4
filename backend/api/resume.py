@@ -42,9 +42,11 @@ def build_diagnosis_prompt(resume_text: str, target_role: str = "产品经理") 
 4. 针对{target_role}岗位的改进建议（至少5条具体建议）
 5. 一句话总结"""
 
-def build_rewrite_prompt(resume_text: str, jd_text: str, mode: str) -> str:
-    """构建简历改写 prompt"""
+def build_rewrite_prompt(resume_text: str, jd_text: str, mode: str, targeting: str = "") -> str:
+    """构建简历改写 prompt。targeting: 首页所选求职定向(端/方向/行业)上下文,提精度。"""
     jd_section = f"\n\n【目标岗位 JD】\n{jd_text.strip()}" if jd_text.strip() else ""
+    if targeting:
+        jd_section = f"\n\n{targeting}" + jd_section
 
     if mode == "light":
         instruction = """你是一位经验丰富的求职顾问，正在帮助候选人优化简历每段经历的呈现方式。
@@ -351,6 +353,9 @@ class RewriteRequest(BaseModel):
     jd_text: str = ""
     target_role: str = "B端产品经理"
     mode: str = "light"   # "light"=轻修(temperature=0.3)  "deep"=精修(temperature=0.8)
+    side: str = ""
+    direction: str = ""
+    industry: str = ""
 
 
 # temperature 对应表
@@ -432,9 +437,11 @@ async def rewrite_resume(req: RewriteRequest):
     if not _llm_key():
         raise HTTPException(status_code=400, detail="未配置 API Key，请在设置页配置")
 
+    from api.ai import build_targeting_context
     client = OpenAI(api_key=_llm_key(), base_url=settings.llm_base_url)
     temperature = TEMPERATURE_MAP.get(req.mode, 0.5)
-    prompt = build_rewrite_prompt(req.resume_text, req.jd_text, req.mode)
+    prompt = build_rewrite_prompt(req.resume_text, req.jd_text, req.mode,
+                                  build_targeting_context(req.side, req.direction, req.industry))
 
     response = client.chat.completions.create(
         model=settings.llm_model,

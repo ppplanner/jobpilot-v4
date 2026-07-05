@@ -142,6 +142,9 @@ export interface ProfileBasic {
   target_role?: string
   target_city?: string
   self_intro?: string
+  target_side?: string       // B端 / C端(首页定位)
+  target_direction?: string  // AI产品 / 策略产品 …
+  target_industry?: string   // 智驾 / 金融 …
 }
 
 export interface ResumeVersion {
@@ -362,7 +365,7 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ jd_text, company }),
       }),
-    jdProfile: (data: { jd_text: string; company?: string; position?: string }) =>
+    jdProfile: (data: { jd_text: string; company?: string; position?: string; side?: string; direction?: string; industry?: string }) =>
       request<{
         pm_type: string
         experience_level: string

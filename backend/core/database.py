@@ -200,7 +200,10 @@ CREATE TABLE IF NOT EXISTS profile_basic (
     graduation  TEXT DEFAULT '',
     target_role TEXT DEFAULT '产品经理',
     target_city TEXT DEFAULT '',
-    self_intro  TEXT DEFAULT ''
+    self_intro  TEXT DEFAULT '',
+    target_side TEXT DEFAULT '',
+    target_direction TEXT DEFAULT '',
+    target_industry TEXT DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS profile_internship (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -327,7 +330,10 @@ CREATE TABLE IF NOT EXISTS profile_basic (
     graduation  TEXT DEFAULT '',
     target_role TEXT DEFAULT '产品经理',
     target_city TEXT DEFAULT '',
-    self_intro  TEXT DEFAULT ''
+    self_intro  TEXT DEFAULT '',
+    target_side TEXT DEFAULT '',
+    target_direction TEXT DEFAULT '',
+    target_industry TEXT DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS profile_internship (
     id          SERIAL PRIMARY KEY,
@@ -423,6 +429,9 @@ _SQLITE_MIGRATIONS = [
     "ALTER TABLE applications ADD COLUMN jd_text TEXT DEFAULT ''",
     "ALTER TABLE resume_versions ADD COLUMN application_id INTEGER DEFAULT NULL",
     "ALTER TABLE resume_versions ADD COLUMN snapshot_json TEXT DEFAULT ''",
+    "ALTER TABLE profile_basic ADD COLUMN target_side TEXT DEFAULT ''",
+    "ALTER TABLE profile_basic ADD COLUMN target_direction TEXT DEFAULT ''",
+    "ALTER TABLE profile_basic ADD COLUMN target_industry TEXT DEFAULT ''",
 ]
 
 _POSTGRES_MIGRATIONS = [
@@ -434,6 +443,9 @@ _POSTGRES_MIGRATIONS = [
     "ALTER TABLE applications ADD COLUMN IF NOT EXISTS jd_text TEXT DEFAULT ''",
     "ALTER TABLE resume_versions ADD COLUMN IF NOT EXISTS application_id INTEGER DEFAULT NULL",
     "ALTER TABLE resume_versions ADD COLUMN IF NOT EXISTS snapshot_json TEXT DEFAULT ''",
+    "ALTER TABLE profile_basic ADD COLUMN IF NOT EXISTS target_side TEXT DEFAULT ''",
+    "ALTER TABLE profile_basic ADD COLUMN IF NOT EXISTS target_direction TEXT DEFAULT ''",
+    "ALTER TABLE profile_basic ADD COLUMN IF NOT EXISTS target_industry TEXT DEFAULT ''",
 ]
 
 

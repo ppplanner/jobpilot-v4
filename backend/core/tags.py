@@ -85,6 +85,21 @@ TAGS = [
      "aliases": ["游戏行业", "手游"]},
     {"id": "ind-tool",       "label": "工具效率",   "domain": "domain",
      "aliases": ["效率工具", "协同办公", "生产力工具"]},
+    # 硬科技 / 实体行业(转行进互联网人群常见来源或目标)
+    {"id": "ind-autodrive",  "label": "智驾",       "domain": "domain",
+     "aliases": ["自动驾驶", "智能驾驶", "ADAS", "智能座舱", "车路协同"]},
+    {"id": "ind-auto",       "label": "汽车",       "domain": "domain",
+     "aliases": ["车企", "整车", "车联网", "汽车行业"]},
+    {"id": "ind-newenergy",  "label": "新能源",     "domain": "domain",
+     "aliases": ["光伏", "储能", "电池", "动力电池", "风电", "新能源行业"]},
+    {"id": "ind-ee",         "label": "电气电子",   "domain": "domain",
+     "aliases": ["电子", "电气", "消费电子", "硬件", "嵌入式", "PCB"]},
+    {"id": "ind-manufacture","label": "智能制造",   "domain": "domain",
+     "aliases": ["制造业", "工业互联网", "智造", "工业软件", "MES"]},
+    {"id": "ind-semicon",    "label": "芯片半导体", "domain": "domain",
+     "aliases": ["半导体", "集成电路", "IC", "芯片", "EDA"]},
+    {"id": "ind-medical",    "label": "医疗健康",   "domain": "domain",
+     "aliases": ["医疗", "大健康", "医药", "医疗器械", "生物医药"]},
 
     # ── 域4 · 技术/工具素养(加分项,二元有/无) ──
     {"id": "t-sql",          "label": "SQL",        "domain": "tooling",

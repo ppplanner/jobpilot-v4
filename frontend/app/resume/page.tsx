@@ -24,6 +24,13 @@ interface InterviewerAnalysis {
 
 const API = ""
 
+// 首页定位选择卡的三轴选项(与 backend/core/tags.py 的 direction/domain 对齐)
+const TARGET_AXES: { label: string; key: "side" | "direction" | "industry"; opts: string[] }[] = [
+  { label: "端", key: "side", opts: ["B端", "C端"] },
+  { label: "产品方向", key: "direction", opts: ["AI产品", "策略产品", "增长产品", "数据产品", "平台产品", "商业化产品", "通用"] },
+  { label: "目标行业", key: "industry", opts: ["电商", "社交内容", "企业服务", "金融科技", "教育", "本地生活", "游戏", "工具效率", "智驾", "汽车", "新能源", "电气电子", "智能制造", "芯片半导体", "医疗健康"] },
+]
+
 const SECTION_HEADERS = [
   '教育背景', '教育经历', '学历背景',
   '实习经历', '工作经历', '实习/工作经历',
@@ -794,6 +801,20 @@ function ResumePageInner() {
   const [applications, setApplications] = useState<Application[]>([])
   const [linkedAppId, setLinkedAppId] = useState<string>("")
 
+  // 首页定位(端/方向/行业)——落库到 profile_basic,全局记住
+  const [targeting, setTargeting] = useState<{ side: string; direction: string; industry: string }>({ side: "", direction: "", industry: "" })
+  const [editTargeting, setEditTargeting] = useState(false)
+  useEffect(() => {
+    api.profile.getBasic().then(b => {
+      setTargeting({ side: b.target_side || "", direction: b.target_direction || "", industry: b.target_industry || "" })
+      if (!b.target_side && !b.target_direction && !b.target_industry) setEditTargeting(true) // 未设定→展开选择卡
+    }).catch(() => {})
+  }, [])
+  const saveTargeting = (next: { side: string; direction: string; industry: string }) => {
+    setTargeting(next)
+    api.profile.updateBasic({ target_side: next.side, target_direction: next.direction, target_industry: next.industry }).catch(() => {})
+  }
+
   const searchParams = useSearchParams()
 
   // 从历史版本还原当时的对比界面
@@ -875,7 +896,7 @@ function ResumePageInner() {
       const resp = await fetch(`${API}/api/v1/ai/interviewer-analysis`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resume_text: rewrittenText, jd_text: jdText, company, position }),
+        body: JSON.stringify({ resume_text: rewrittenText, jd_text: jdText, company, position, side: targeting.side, direction: targeting.direction, industry: targeting.industry }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data.detail || "分析失败")
@@ -969,11 +990,23 @@ function ResumePageInner() {
     setLoading(true)
     setError("")
     setRewrittenWordCount(null)
+    const tgt = { side: targeting.side, direction: targeting.direction, industry: targeting.industry }
     try {
+      // 先出两个 agent 的要点(带定向,并行),再据此改写
+      setJdProfile(null); setInterviewerAnalysis(null)
+      Promise.all([
+        jdText.trim()
+          ? api.ai.jdProfile({ jd_text: jdText, company, position, ...tgt }).then(setJdProfile).catch(() => {})
+          : Promise.resolve(),
+        fetch(`${API}/api/v1/ai/interviewer-analysis`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resume_text: resumeText, jd_text: jdText, company, position, ...tgt }),
+        }).then(r => r.ok ? r.json() : null).then(d => d && setInterviewerAnalysis(d)).catch(() => {}),
+      ])
       const resp = await fetch(`${API}/api/v1/resume/rewrite`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resume_text: resumeText, jd_text: jdText, mode }),
+        body: JSON.stringify({ resume_text: resumeText, jd_text: jdText, mode, ...tgt }),
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data.detail || "生成失败")
@@ -1013,7 +1046,7 @@ function ResumePageInner() {
     setAnalyzingJd(true)
     setJdProfileError("")
     try {
-      const data = await api.ai.jdProfile({ jd_text: jdText, company, position })
+      const data = await api.ai.jdProfile({ jd_text: jdText, company, position, side: targeting.side, direction: targeting.direction, industry: targeting.industry })
       setJdProfile(data)
       persistTagMatch()
     } catch (e: any) {
@@ -1158,6 +1191,47 @@ function ResumePageInner() {
         <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-1">Career Switch · Resume Matching</p>
         <h1 className="text-2xl font-bold text-[var(--text-main)] font-cartoon">转行进互联网 · 简历适配台</h1>
         <p className="text-sm text-[var(--text-muted)] mt-1.5">贴上你的基础简历和目标 JD，我帮你把简历改到岗位想要的样子。</p>
+      </div>
+
+      {/* 定位(端/方向/行业)——一次设定全局记住,AI 据此收窄参考提精度 */}
+      <div className="max-w-2xl mx-auto mb-5">
+        {editTargeting ? (
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 space-y-3">
+            <p className="text-xs font-semibold text-[var(--text-sub)]">先定位一下，AI 会按你的端 / 方向 / 行业收窄参考、提升精度</p>
+            {TARGET_AXES.map(ax => (
+              <div key={ax.key}>
+                <p className="text-[11px] text-[var(--text-muted)] mb-1.5">{ax.label}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {ax.opts.map(o => {
+                    const on = targeting[ax.key] === o
+                    return (
+                      <button key={o} onClick={() => saveTargeting({ ...targeting, [ax.key]: on ? "" : o })}
+                        className={`px-2.5 py-1 rounded-full text-xs transition-colors border ${
+                          on ? "bg-[var(--primary)] text-white border-[var(--primary)]"
+                             : "bg-[var(--surface2)] text-[var(--text-sub)] border-transparent hover:border-[var(--primary)]/50"}`}>
+                        {o}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+            <div className="text-right">
+              <button onClick={() => setEditTargeting(false)} className="text-xs font-medium text-[var(--primary)] hover:underline">完成</button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-2 text-xs">
+            <span className="text-[var(--text-muted)]">定位</span>
+            {[targeting.side, targeting.direction, targeting.industry].filter(Boolean).map((t, i) => (
+              <span key={i} className="px-2 py-0.5 rounded-full bg-[var(--surface2)] border border-[var(--border)] text-[var(--text-sub)]">{t}</span>
+            ))}
+            {!targeting.side && !targeting.direction && !targeting.industry && (
+              <span className="text-[var(--text-muted)]">未设定</span>
+            )}
+            <button onClick={() => setEditTargeting(true)} className="text-[var(--primary)] hover:underline">改</button>
+          </div>
+        )}
       </div>
 
       {/* 生成后:输入区收成一行(可展开重改) */}
@@ -1315,6 +1389,49 @@ function ResumePageInner() {
               </button>
             </div>
           </div>
+
+          {/* 两个 agent 的分析要点(生成时先跑,展示后再看改写) */}
+          {(jdProfile || interviewerAnalysis || loadingAnalysis) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* JD 分析 agent */}
+              <div className="rounded-xl border border-[#C4D2D4] bg-[#E2EBEC]/50 p-4">
+                <p className="text-xs font-bold text-[#2E5B54] mb-2">JD 分析 · 岗位要点</p>
+                {jdProfile ? (
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="px-2 py-0.5 bg-[#2E5B54] text-white text-[11px] font-medium rounded-full">{jdProfile.pm_type}</span>
+                      <span className="px-2 py-0.5 bg-white border border-[#C4D2D4] text-[#2E5B54] text-[11px] rounded-full">{jdProfile.experience_level}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {jdProfile.key_dimensions.filter(d => d.priority === "核心" || d.priority === "重要").map((d, i) => (
+                        <span key={i} className={`text-[11px] px-2 py-0.5 rounded-full ${d.priority === "核心" ? "bg-[#F1E0DA] text-[#9E4631]" : "bg-[#F2E9D6] text-[#876426]"}`}>{d.name}</span>
+                      ))}
+                    </div>
+                    <p className="text-xs text-[#234B47] leading-relaxed">💡 {jdProfile.rewrite_focus}</p>
+                  </div>
+                ) : <p className="text-xs text-[var(--text-muted)]">未填 JD，已跳过 JD 分析</p>}
+              </div>
+              {/* 简历分析 agent */}
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface2)]/60 p-4">
+                <p className="text-xs font-bold text-[var(--text-main)] mb-2">简历分析 · 要点 / 薄弱点</p>
+                {interviewerAnalysis ? (
+                  <div className="space-y-1.5">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-lg font-bold text-[var(--primary)] leading-none">{interviewerAnalysis.overall_score}</span>
+                      <span className="text-[11px] text-[var(--text-muted)]">/100</span>
+                      <span className="text-xs text-[var(--text-sub)] leading-snug">{interviewerAnalysis.summary}</span>
+                    </div>
+                    {interviewerAnalysis.weak_signals?.length > 0 && (
+                      <p className="text-[11px] text-[#9E4631]">待改：{interviewerAnalysis.weak_signals.slice(0, 4).join(" / ")}</p>
+                    )}
+                    {interviewerAnalysis.strong_signals?.length > 0 && (
+                      <p className="text-[11px] text-[#3C6B4E]">亮点：{interviewerAnalysis.strong_signals.slice(0, 4).join(" / ")}</p>
+                    )}
+                  </div>
+                ) : <p className="text-xs text-[var(--text-muted)]">分析生成中…</p>}
+              </div>
+            </div>
+          )}
 
           {/* 双栏对比 */}
           {result?.raw ? (

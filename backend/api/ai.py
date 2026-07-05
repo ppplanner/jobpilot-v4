@@ -270,10 +270,26 @@ async def chat_stream(req: ChatRequest):
 
 
 # ===== POST /api/v1/ai/jd-profile — JD人才画像分析 =====
+def build_targeting_context(side: str = "", direction: str = "", industry: str = "") -> str:
+    """把用户在首页选的求职定向(端/方向/行业)拼成一段注入 prompt 的上下文,收窄参考范围提精度。"""
+    parts = []
+    if side:      parts.append(f"目标端:{side}")
+    if direction: parts.append(f"产品方向:{direction}")
+    if industry:  parts.append(f"目标行业:{industry}")
+    if not parts:
+        return ""
+    return ("【求职定向】" + " | ".join(parts)
+            + "。请聚焦该端/方向/行业的关键能力、专业术语与评价标准来分析和改写，"
+              "对齐该领域招聘方最看重的点，不要泛泛而谈。")
+
+
 class JDProfileRequest(BaseModel):
     jd_text: str
     company: str = ""
     position: str = ""
+    side: str = ""
+    direction: str = ""
+    industry: str = ""
 
 
 @router.post("/jd-profile")
@@ -290,8 +306,9 @@ async def jd_profile(req: JDProfileRequest):
     if not api_key:
         raise HTTPException(status_code=400, detail="未配置 API Key，请先到设置页填写")
 
+    targeting = build_targeting_context(req.side, req.direction, req.industry)
     prompt = f"""你是资深PM招聘顾问。请解读以下JD，告诉候选人这个岗位偏向什么样的人。
-
+{targeting}
 目标公司：{req.company or "未知"}
 目标岗位：{req.position or "产品经理"}
 
@@ -909,10 +926,13 @@ must_add最多5条，highlight最多5条"""
 
 # ===== POST /api/v1/ai/interviewer-analysis — 面试官视角分析 =====
 class InterviewerAnalysisRequest(BaseModel):
-    resume_text: str       # 改写后的简历文本
+    resume_text: str       # 简历文本(原文或改写后)
     jd_text: str = ""      # JD文本（可选，有JD分析更精准）
     company: str = ""
     position: str = ""
+    side: str = ""
+    direction: str = ""
+    industry: str = ""
 
 
 @router.post("/interviewer-analysis")
@@ -933,8 +953,10 @@ async def interviewer_analysis(req: InterviewerAnalysisRequest):
 
     jd_section = f"\n\n【目标岗位 JD】\n{req.jd_text[:2000]}" if req.jd_text.strip() else ""
     company_info = f"{req.company} · {req.position}" if req.company else req.position or "产品经理"
+    targeting = build_targeting_context(req.side, req.direction, req.industry)
 
     prompt = f"""你是一位{company_info}岗位的资深面试官。请从面试官视角严格审视以下简历，找出薄弱点和追问点。
+{targeting}
 
 【简历内容（已经过AI改写）】
 {req.resume_text[:2500]}{jd_section}
