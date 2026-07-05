@@ -1144,7 +1144,7 @@ function ResumePageInner() {
   const inputCls = "w-full border border-[var(--border)] bg-[var(--surface2)] rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-[var(--primary)] transition-colors placeholder:text-[var(--text-muted)]"
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8" style={SHEET_GRID}>
+    <div className="max-w-5xl mx-auto px-4 py-8">
       {/* 素材库同步 toast */}
       {libToast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#1a1a1a] text-white text-sm px-5 py-3 rounded-full shadow-xl animate-fade-in">
@@ -1154,24 +1154,10 @@ function ResumePageInner() {
           <button onClick={() => setLibToast(null)} className="text-white/50 hover:text-white ml-1">×</button>
         </div>
       )}
-      <div className="relative mb-6 overflow-hidden rounded-2xl bg-[var(--hero)] px-6 py-6 text-white">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
-          style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "22px 22px" }} />
-        <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-xl">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Career Switch · Resume Matching</p>
-            <h1 className="text-2xl font-bold leading-tight mb-3">转行进互联网 · 简历适配台</h1>
-            <p className="text-sm leading-6 text-white/78">
-              专为转行进互联网的人：留一份基础简历，针对每个目标岗位拆解 JD、匹配你的经历，生成一份能投的定制版本。
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
-              <span className="rounded-full bg-white/12 px-3 py-1 text-white/85">能力标签对齐</span>
-              <span className="rounded-full bg-white/12 px-3 py-1 text-white/85">岗位缺口识别</span>
-              <span className="rounded-full bg-[var(--accent)] px-3 py-1 text-[var(--hero)]">多版本改写</span>
-            </div>
-          </div>
-          <ResumeMatchIllustration />
-        </div>
+      <div className="mb-6">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-0.5">Career Switch · Resume Matching</p>
+        <h1 className="text-xl font-bold text-[var(--text-main)] font-cartoon">转行进互联网 · 简历适配台</h1>
+        <p className="text-xs text-[var(--text-muted)] mt-1">留一份基础简历，针对每个目标岗位拆解 JD、匹配你的经历，生成一份能投的定制版本。</p>
       </div>
 
       {/* 生成后:输入区收成一行(可展开重改) */}
@@ -1187,16 +1173,19 @@ function ResumePageInner() {
         </button>
       )}
 
-      {/* ① 基础简历(单屏) */}
+      {/* 输入区(单屏·去框·①② 并排,落在基底背景上) */}
       {showInput && (
-        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
-          <p className="text-sm font-semibold text-[var(--text-main)] mb-3"><span className="text-[var(--primary)]">①</span> 你的基础简历</p>
+        <div className="mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          <div>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-semibold text-[var(--text-main)]"><span className="text-[var(--primary)]">①</span> 你的基础简历</p>
           {/* 来源 tab 切换 */}
-          <div className="flex gap-1 mb-4 bg-[var(--surface2)] rounded-lg p-1 w-fit">
-            {([["upload", "📄 粘贴 / 上传"], ["library", "📦 从素材库导入"]] as const).map(([key, label]) => (
+          <div className="flex gap-1 bg-[var(--surface2)] rounded-lg p-0.5">
+            {([["upload", "粘贴/上传"], ["library", "素材库"]] as const).map(([key, label]) => (
               <button key={key}
                 onClick={() => setStep1Mode(key)}
-                className={`px-4 py-1.5 text-xs rounded-md font-medium transition-colors ${
+                className={`px-2.5 py-1 text-[11px] rounded-md font-medium transition-colors ${
                   step1Mode === key
                     ? "bg-[var(--surface)] text-[var(--text-main)] shadow-sm"
                     : "text-[var(--text-muted)] hover:text-[var(--text-main)]"
@@ -1205,6 +1194,7 @@ function ResumePageInner() {
               </button>
             ))}
           </div>
+          </div>{/* ① 标题行结束 */}
 
           {step1Mode === "upload" ? (
             <ResumeDropZone value={resumeText} onChange={handleResumeChange} />
@@ -1212,14 +1202,12 @@ function ResumePageInner() {
             <MaterialImporter onImport={text => { handleResumeChange(text); setStep1Mode("upload") }} />
           )}
 
-          <p className="mt-3 text-xs text-[var(--text-muted)]">支持 PDF / Word / TXT 拖拽上传，也可直接在框内粘贴文字（扫描件可能无法提取文字）</p>
-        </div>
-      )}
+          <p className="mt-2 text-xs text-[var(--text-muted)]">支持 PDF / Word / TXT，也可直接粘贴文字</p>
+          </div>{/* ① 列结束 */}
 
-      {/* ② 目标 JD + 生成(单屏) */}
-      {showInput && (
-        <div data-shot="jd" className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4 mt-4">
-          <p className="text-sm font-semibold text-[var(--text-main)]"><span className="text-[var(--primary)]">②</span> 目标岗位 JD <span className="text-xs font-normal text-[var(--text-muted)]">（选填，填了改写更有针对性）</span></p>
+          {/* ② 目标 JD */}
+          <div data-shot="jd">
+          <p className="text-sm font-semibold text-[var(--text-main)] mb-3"><span className="text-[var(--primary)]">②</span> 目标岗位 JD <span className="text-xs font-normal text-[var(--text-muted)]">（选填）</span></p>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-[var(--text-muted)] mb-1 block">目标公司</label>
@@ -1233,130 +1221,14 @@ function ResumePageInner() {
             </div>
           </div>
 
+          <div className="mt-3">
+            <JDTextArea value={jdText} onChange={v => { setJdText(v); setJdProfile(null) }} />
+          </div>
           {company.trim() && (
-            <div className="flex items-center gap-2 text-xs bg-[#E3EDE3] border border-[#CBD8C4] rounded-lg px-3 py-2">
-              <span className="text-[#4F8063]">✓</span>
-              <span className="text-[#3C6B4E]">生成后将自动同步到投递看板（{company} · {position || "产品经理"}）</span>
-            </div>
+            <p className="mt-2 text-xs text-[#3C6B4E]">✓ 生成后自动同步到投递看板（{company}{position ? " · " + position : ""}）</p>
           )}
-
-          <JDTextArea value={jdText} onChange={v => { setJdText(v); setJdProfile(null) }} />
-
-          {/* JD 人才画像分析 */}
-          {jdText.trim().length > 80 && !jdProfile && (
-            <div className="flex items-center gap-3">
-              <button onClick={analyzeJD} disabled={analyzingJd}
-                className="flex items-center gap-2 px-4 py-2 bg-[#E2EBEC] border border-[#C4D2D4] text-[#2E5B54] text-xs font-semibold rounded-lg hover:bg-[#E2EBEC] transition-colors disabled:opacity-60">
-                {analyzingJd ? (
-                  <><svg className="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>解读中...</>
-                ) : "🔍 解读这份JD（先看清楚招什么人，再改简历）"}
-              </button>
-              {jdProfileError && <p className="text-xs text-[#B6634A]">{jdProfileError}</p>}
-            </div>
-          )}
-
-          {jdProfile && (
-            <div className="bg-[#E2EBEC] border border-[#C4D2D4] rounded-xl p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2 py-0.5 bg-[#2E5B54] text-white text-xs font-bold rounded-full">{jdProfile.pm_type}</span>
-                  <span className="px-2 py-0.5 bg-white border border-[#C4D2D4] text-[#2E5B54] text-xs rounded-full">{jdProfile.experience_level}</span>
-                </div>
-                <button onClick={() => setJdProfile(null)} className="text-[10px] text-[#5B7E86] hover:text-[#2E5B54] shrink-0">关闭</button>
-              </div>
-
-              {/* 核心能力维度（精简版：只显示核心+重要） */}
-              <div className="flex flex-wrap gap-1.5">
-                {jdProfile.key_dimensions
-                  .filter(d => d.priority === "核心" || d.priority === "重要")
-                  .map((d, i) => (
-                    <span key={i} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      d.priority === "核心" ? "bg-[#F1E0DA] text-[#9E4631]" : "bg-[#F2E9D6] text-[#876426]"
-                    }`}>{d.name}</span>
-                  ))}
-              </div>
-
-              {/* 改写重点 */}
-              <div className="flex items-start gap-2">
-                <span className="text-sm shrink-0">💡</span>
-                <p className="text-xs text-[#234B47] font-medium">{jdProfile.rewrite_focus}</p>
-              </div>
-            </div>
-          )}
-
-          {/* JD → 素材库经历匹配推荐 */}
-          {jdText.trim().length > 80 && (
-            <div className="space-y-2">
-              {!matchResult && (
-                <button onClick={runMatchMaterials} disabled={matchingMaterials}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#E3EDE3] border border-[#CBD8C4] text-[#3C6B4E] text-xs font-semibold rounded-lg hover:bg-[#CBD8C4] transition-colors disabled:opacity-60">
-                  {matchingMaterials ? (
-                    <><svg className="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>匹配中...</>
-                  ) : "🎯 推荐匹配经历（从素材库挑出最适合这份JD的经历）"}
-                </button>
-              )}
-              {matchError && <p className="text-xs text-[#B6634A]">{matchError}</p>}
-
-              {matchResult && matchResult.empty && (
-                <div className="bg-[#E3EDE3] border border-[#CBD8C4] rounded-xl p-4 text-center space-y-2">
-                  <p className="text-sm font-medium text-[var(--text-main)]">素材库还没有经历可推荐</p>
-                  <p className="text-xs text-[var(--text-muted)]">先去添加实习 / 项目经历，下次粘 JD 就能自动推荐最匹配的经历</p>
-                  <Link href="/profile" className="inline-block mt-1 px-4 py-1.5 bg-[var(--primary)] text-white text-xs rounded-lg font-medium hover:opacity-90 transition-opacity">去建立素材库 →</Link>
-                </div>
-              )}
-
-              {matchResult && !matchResult.empty && (
-                <div className="bg-[#E3EDE3] border border-[#CBD8C4] rounded-xl p-4 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-[#3C6B4E]">🎯 匹配经历推荐（按匹配度排序）</p>
-                    <button onClick={() => { setMatchResult(null); setAddedExp(new Set()) }} className="text-[10px] text-[#4F8063] hover:text-[#3C6B4E] shrink-0">重新推荐</button>
-                  </div>
-
-                  {matchResult.internships.map(rec => {
-                    const exp = libInterns.find(i => i.id === rec.id)
-                    if (!exp) return null
-                    const key = "i-" + rec.id
-                    const added = addedExp.has(key)
-                    return (
-                      <div key={key} className="bg-white border border-[#CBD8C4] rounded-lg px-3 py-2.5 flex items-start gap-3">
-                        <span className={`shrink-0 text-xs font-bold px-2 py-0.5 rounded-full ${rec.match === "高" ? "bg-[#F1E0DA] text-[#9E4631]" : rec.match === "中" ? "bg-[#F2E9D6] text-[#876426]" : "bg-gray-100 text-gray-500"}`}>{rec.match}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-[var(--text-main)]">实习 · {exp.company} · {exp.position}</p>
-                          <p className="text-xs text-[var(--text-muted)] mt-0.5">{rec.reason}</p>
-                        </div>
-                        <button onClick={() => addExperienceToResume(internToText(exp), key)} disabled={added}
-                          className={`shrink-0 text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${added ? "text-[#4F8063]" : "bg-[var(--primary)] text-white hover:opacity-90"}`}>
-                          {added ? "已加入 ✓" : "＋ 加入简历"}
-                        </button>
-                      </div>
-                    )
-                  })}
-
-                  {matchResult.projects.map(rec => {
-                    const exp = libProjects.find(p => p.id === rec.id)
-                    if (!exp) return null
-                    const key = "p-" + rec.id
-                    const added = addedExp.has(key)
-                    return (
-                      <div key={key} className="bg-white border border-[#CBD8C4] rounded-lg px-3 py-2.5 flex items-start gap-3">
-                        <span className={`shrink-0 text-xs font-bold px-2 py-0.5 rounded-full ${rec.match === "高" ? "bg-[#F1E0DA] text-[#9E4631]" : rec.match === "中" ? "bg-[#F2E9D6] text-[#876426]" : "bg-gray-100 text-gray-500"}`}>{rec.match}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-[var(--text-main)]">项目 · {exp.name} · {exp.role}</p>
-                          <p className="text-xs text-[var(--text-muted)] mt-0.5">{rec.reason}</p>
-                        </div>
-                        <button onClick={() => addExperienceToResume(projectToText(exp), key)} disabled={added}
-                          className={`shrink-0 text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${added ? "text-[#4F8063]" : "bg-[var(--primary)] text-white hover:opacity-90"}`}>
-                          {added ? "已加入 ✓" : "＋ 加入简历"}
-                        </button>
-                      </div>
-                    )
-                  })}
-
-                  <p className="text-[10px] text-[var(--text-muted)] pt-1">「加入简历」会把该段经历追加到 Step1 的简历内容，改写时一并处理</p>
-                </div>
-              )}
-            </div>
-          )}
+          </div>{/* ② 列结束 */}
+          </div>{/* ①② grid 结束 */}
 
           {error && <p className="text-sm text-[#B6634A] bg-[#F1E0DA] rounded-lg px-3 py-2">{error}</p>}
 
