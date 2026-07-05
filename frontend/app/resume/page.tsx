@@ -1154,10 +1154,10 @@ function ResumePageInner() {
           <button onClick={() => setLibToast(null)} className="text-white/50 hover:text-white ml-1">×</button>
         </div>
       )}
-      <div className="mb-6">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-0.5">Career Switch · Resume Matching</p>
-        <h1 className="text-xl font-bold text-[var(--text-main)] font-cartoon">转行进互联网 · 简历适配台</h1>
-        <p className="text-xs text-[var(--text-muted)] mt-1">留一份基础简历，针对每个目标岗位拆解 JD、匹配你的经历，生成一份能投的定制版本。</p>
+      <div className={`mb-6 ${showInput ? "text-center pt-8" : ""}`}>
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-1">Career Switch · Resume Matching</p>
+        <h1 className="text-2xl font-bold text-[var(--text-main)] font-cartoon">转行进互联网 · 简历适配台</h1>
+        <p className="text-sm text-[var(--text-muted)] mt-1.5">贴上你的基础简历和目标 JD，我帮你把简历改到岗位想要的样子。</p>
       </div>
 
       {/* 生成后:输入区收成一行(可展开重改) */}
@@ -1173,10 +1173,10 @@ function ResumePageInner() {
         </button>
       )}
 
-      {/* 输入区(单屏·去框·①② 并排,落在基底背景上) */}
+      {/* 输入区(居中窄栏·ChatGPT 首屏感·落在基底背景上) */}
       {showInput && (
-        <div className="mb-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <div className="max-w-2xl mx-auto mb-4">
+          <div className="space-y-6">
           <div>
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm font-semibold text-[var(--text-main)]"><span className="text-[var(--primary)]">①</span> 你的基础简历</p>
