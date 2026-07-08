@@ -36,7 +36,9 @@
 
 ## 改动日志
 
-### 2026-07-05
+### 2026-07-06
+- **首页(适配台)改为双栏工作区(参考 Triply 布局)**:`resume/page.tsx` 输入区从"居中单列"改为 `grid lg:grid-cols-12` 双栏,容器 `max-w-5xl`→`max-w-6xl`(与其他页一致),标题去居中。**左栏(col-span-5,窄)**:三张卡片——基础简历(`ResumeDropZone` 拖拽上传/粘贴)、从素材库选择(`MaterialImporter` 勾选导入)、历史简历版本(复用 `VersionHistoryPanel`,点进看上次修改)。**右栏(col-span-7,宽)**:一张卡片(参考投递看板图框)——目标公司/岗位 + JD 粘贴(`JDTextArea`)+ 力度 + 生成,均复用现有功能。生成后仍走"两 agent 要点 + 双栏改写"内联展开。定位条改为左对齐全宽。功能全复用,`tsc` 通过。
+  - **⚠ 环境问题(非代码)**:本会话多次重启 dev server 后,Windows 出现 `0xC0000142`(STATUS_DLL_INIT_FAILED)——Turbopack 处理 `globals.css` 时无法再 spawn PostCSS worker 子进程(desktop heap 耗尽),导致 `/` 返回 500。killall node 也不解;**需新开终端会话/注销重登后 `npm run dev` 方可**。改动本身 tsc 通过、未上屏截图待环境恢复后验收。
 - **首页定位卡 + 双 Agent 分析流(适配台升级)**:见计划 `.claude/plans/serialized-scribbling-snowflake.md`。
   - **后端**:① `core/tags.py` domain(行业)组新增硬科技/实体行业 智驾/汽车/新能源/电气电子/智能制造/芯片半导体/医疗健康(各带 aliases);② `api/ai.py` 新增 `build_targeting_context(side,direction,industry)`,并给 `JDProfileRequest`/`InterviewerAnalysisRequest` 加 3 字段、注入 `/jd-profile`、`/interviewer-analysis` prompt;③ `api/resume.py` `RewriteRequest` 加 3 字段、`build_rewrite_prompt` 加 targeting 形参并注入(caller 处 `from api.ai import build_targeting_context` 函数内导入避免循环);④ `core/database.py` 给 `profile_basic` 补列并写进两处 CREATE TABLE + SQLite/PG 迁移列表 `target_side/target_direction/target_industry`;`api/profile.py` BasicInfoUpdate 加 3 字段(GET 用 SELECT * 自动带出)。
   - **前端**:① `lib/api.ts` `ProfileBasic` + `ai.jdProfile` 入参加 side/direction/industry;② `resume/page.tsx` 顶部新增**定位条**(`TARGET_AXES` 三轴选项:端 B/C、方向、行业;未设定展开选择卡、已设定显示 chips+改;选择即 `PUT /profile/basic` 落库,进页 `getBasic` 回填);③ `generate()` 先并行跑 **JD分析 agent(`/jd-profile`)+ 简历分析 agent(`/interviewer-analysis`,分析原简历)**,再 `/resume/rewrite`,三次都带定向;结果区顶部新增**两块要点面板**(JD分析要点 + 简历分析要点/薄弱点),下方仍是双栏对比。

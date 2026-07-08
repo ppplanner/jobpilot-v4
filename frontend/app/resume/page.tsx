@@ -1177,7 +1177,7 @@ function ResumePageInner() {
   const inputCls = "w-full border border-[var(--border)] bg-[var(--surface2)] rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-[var(--primary)] transition-colors placeholder:text-[var(--text-muted)]"
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8">
       {/* 素材库同步 toast */}
       {libToast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#1a1a1a] text-white text-sm px-5 py-3 rounded-full shadow-xl animate-fade-in">
@@ -1187,14 +1187,14 @@ function ResumePageInner() {
           <button onClick={() => setLibToast(null)} className="text-white/50 hover:text-white ml-1">×</button>
         </div>
       )}
-      <div className={`mb-6 ${showInput ? "text-center pt-8" : ""}`}>
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-1">Career Switch · Resume Matching</p>
-        <h1 className="text-2xl font-bold text-[var(--text-main)] font-cartoon">转行进互联网 · 简历适配台</h1>
-        <p className="text-sm text-[var(--text-muted)] mt-1.5">贴上你的基础简历和目标 JD，我帮你把简历改到岗位想要的样子。</p>
+      <div className="mb-5">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] mb-0.5">Career Switch · Resume Matching</p>
+        <h1 className="text-xl font-bold text-[var(--text-main)] font-cartoon">转行进互联网 · 简历适配台</h1>
+        <p className="text-xs text-[var(--text-muted)] mt-1">左边整理你的基础简历，右边贴上目标 JD，一键生成这一岗位的定制版本。</p>
       </div>
 
       {/* 定位(端/方向/行业)——一次设定全局记住,AI 据此收窄参考提精度 */}
-      <div className="max-w-2xl mx-auto mb-5">
+      <div className="mb-5">
         {editTargeting ? (
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 space-y-3">
             <p className="text-xs font-semibold text-[var(--text-sub)]">先定位一下，AI 会按你的端 / 方向 / 行业收窄参考、提升精度</p>
@@ -1247,94 +1247,81 @@ function ResumePageInner() {
         </button>
       )}
 
-      {/* 输入区(居中窄栏·ChatGPT 首屏感·落在基底背景上) */}
+      {/* 输入区:双栏工作区(左=基础简历/素材/历史,右=粘贴JD;参考投递看板卡片图框) */}
       {showInput && (
-        <div className="max-w-2xl mx-auto mb-4">
-          <div className="space-y-6">
-          <div>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-[var(--text-main)]"><span className="text-[var(--primary)]">①</span> 你的基础简历</p>
-          {/* 来源 tab 切换 */}
-          <div className="flex gap-1 bg-[var(--surface2)] rounded-lg p-0.5">
-            {([["upload", "粘贴/上传"], ["library", "素材库"]] as const).map(([key, label]) => (
-              <button key={key}
-                onClick={() => setStep1Mode(key)}
-                className={`px-2.5 py-1 text-[11px] rounded-md font-medium transition-colors ${
-                  step1Mode === key
-                    ? "bg-[var(--surface)] text-[var(--text-main)] shadow-sm"
-                    : "text-[var(--text-muted)] hover:text-[var(--text-main)]"
-                }`}>
-                {label}
-              </button>
-            ))}
-          </div>
-          </div>{/* ① 标题行结束 */}
-
-          {step1Mode === "upload" ? (
-            <ResumeDropZone value={resumeText} onChange={handleResumeChange} />
-          ) : (
-            <MaterialImporter onImport={text => { handleResumeChange(text); setStep1Mode("upload") }} />
-          )}
-
-          <p className="mt-2 text-xs text-[var(--text-muted)]">支持 PDF / Word / TXT，也可直接粘贴文字</p>
-          </div>{/* ① 列结束 */}
-
-          {/* ② 目标 JD */}
-          <div data-shot="jd">
-          <p className="text-sm font-semibold text-[var(--text-main)] mb-3"><span className="text-[var(--primary)]">②</span> 目标岗位 JD <span className="text-xs font-normal text-[var(--text-muted)]">（选填）</span></p>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-[var(--text-muted)] mb-1 block">目标公司</label>
-              <input value={company} onChange={e => setCompany(e.target.value)}
-                placeholder="如：字节跳动" className={inputCls} />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-4">
+          {/* ── 左栏(窄):基础简历 ── */}
+          <div className="lg:col-span-5 space-y-4">
+            {/* 简历:拖拽上传 / 粘贴 */}
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
+              <p className="text-sm font-semibold text-[var(--text-main)] mb-3">基础简历</p>
+              <ResumeDropZone value={resumeText} onChange={handleResumeChange} />
+              <p className="mt-2 text-xs text-[var(--text-muted)]">拖拽 PDF / Word / TXT 到框内，或直接粘贴文字</p>
             </div>
-            <div>
-              <label className="text-xs text-[var(--text-muted)] mb-1 block">目标岗位</label>
-              <input value={position} onChange={e => setPosition(e.target.value)}
-                placeholder="如：B端产品经理" className={inputCls} />
+            {/* 从素材库集合中勾选 */}
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
+              <p className="text-sm font-semibold text-[var(--text-main)] mb-2">从素材库选择</p>
+              <p className="text-xs text-[var(--text-muted)] mb-3">勾选已有的实习 / 项目 / 技能，导入为基础简历</p>
+              <MaterialImporter onImport={text => handleResumeChange(text)} />
+            </div>
+            {/* 历史简历版本(点进去看上次修改) */}
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
+              <p className="text-sm font-semibold text-[var(--text-main)] mb-3">历史简历版本</p>
+              <VersionHistoryPanel refreshKey={versionsKey} />
             </div>
           </div>
 
-          <div className="mt-3">
-            <JDTextArea value={jdText} onChange={v => { setJdText(v); setJdProfile(null) }} />
-          </div>
-          {company.trim() && (
-            <p className="mt-2 text-xs text-[#3C6B4E]">✓ 生成后自动同步到投递看板（{company}{position ? " · " + position : ""}）</p>
-          )}
-          </div>{/* ② 列结束 */}
-          </div>{/* ①② grid 结束 */}
-
-          {error && <p className="text-sm text-[#B6634A] bg-[#F1E0DA] rounded-lg px-3 py-2">{error}</p>}
-
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-sm text-[var(--text-sub)]">改写力度：</span>
-            {[
-              { key: "light" as const, label: "轻修", desc: "优化表达，保留原风格" },
-              { key: "deep"  as const, label: "精修", desc: "结果先行 + 压缩STAR，大幅重构" },
-            ].map(m => (
-              <button key={m.key} onClick={() => setMode(m.key)} title={m.desc}
-                className={`px-4 py-1.5 rounded-full text-sm transition-colors border ${
-                  mode === m.key
-                    ? "bg-[var(--primary-bg)] border-[var(--primary)] text-[var(--primary)] font-medium"
-                    : "bg-[var(--surface2)] border-transparent text-[var(--text-sub)] hover:bg-[var(--border)]"
-                }`}>
-                {m.label}
-                <span className="text-xs ml-1 opacity-60 hidden sm:inline">（{m.desc}）</span>
-              </button>
-            ))}
-
-            <button onClick={generate} disabled={loading}
-              className="ml-auto px-6 py-2 bg-[var(--primary)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center gap-2">
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                  </svg>
-                  AI 改写中...
-                </>
-              ) : "生成适配版本 →"}
-            </button>
+          {/* ── 右栏(宽):粘贴目标 JD + 生成 ── */}
+          <div className="lg:col-span-7">
+            <div data-shot="jd" className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
+              <p className="text-sm font-semibold text-[var(--text-main)]">目标岗位 JD <span className="text-xs font-normal text-[var(--text-muted)]">（选填，填了改写更有针对性）</span></p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-[var(--text-muted)] mb-1 block">目标公司</label>
+                  <input value={company} onChange={e => setCompany(e.target.value)}
+                    placeholder="如：字节跳动" className={inputCls} />
+                </div>
+                <div>
+                  <label className="text-xs text-[var(--text-muted)] mb-1 block">目标岗位</label>
+                  <input value={position} onChange={e => setPosition(e.target.value)}
+                    placeholder="如：B端产品经理" className={inputCls} />
+                </div>
+              </div>
+              <JDTextArea value={jdText} onChange={v => { setJdText(v); setJdProfile(null) }} />
+              {company.trim() && (
+                <p className="text-xs text-[#3C6B4E]">✓ 生成后自动同步到投递看板（{company}{position ? " · " + position : ""}）</p>
+              )}
+              {error && <p className="text-sm text-[#B6634A] bg-[#F1E0DA] rounded-lg px-3 py-2">{error}</p>}
+              <div className="flex items-center gap-3 flex-wrap pt-3 border-t border-[var(--border)]">
+                <span className="text-sm text-[var(--text-sub)]">改写力度：</span>
+                {[
+                  { key: "light" as const, label: "轻修", desc: "优化表达，保留原风格" },
+                  { key: "deep"  as const, label: "精修", desc: "结果先行 + 压缩STAR，大幅重构" },
+                ].map(m => (
+                  <button key={m.key} onClick={() => setMode(m.key)} title={m.desc}
+                    className={`px-4 py-1.5 rounded-full text-sm transition-colors border ${
+                      mode === m.key
+                        ? "bg-[var(--primary-bg)] border-[var(--primary)] text-[var(--primary)] font-medium"
+                        : "bg-[var(--surface2)] border-transparent text-[var(--text-sub)] hover:bg-[var(--border)]"
+                    }`}>
+                    {m.label}
+                    <span className="text-xs ml-1 opacity-60 hidden sm:inline">（{m.desc}）</span>
+                  </button>
+                ))}
+                <button onClick={generate} disabled={loading}
+                  className="ml-auto px-6 py-2 bg-[var(--primary)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center gap-2">
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      </svg>
+                      AI 改写中...
+                    </>
+                  ) : "生成适配版本 →"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
