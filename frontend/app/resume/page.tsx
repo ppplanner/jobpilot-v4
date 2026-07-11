@@ -351,6 +351,18 @@ function diffHighlight(original: string, rewritten: string): React.ReactNode {
     else j++
   }
 
+  // 只标注"实质性"改动:去掉标点/空白与单独的介词/助词/量词;
+  // 数字、百分号、英文(数据与行业名词如 AB/PRD/SQL/DAU)始终保留高亮 → 高亮聚焦行业名词与数据。
+  const PUNCT = /[\s，。、；：？！“”‘’（）()【】\[\]{}<>《》—…·।.,;:?!"'`~|\\/*+=_#@&\-]/
+  const STOP = new Set("的了地得着过和与及或为对把被向从于以之而且并就也都将是有个项名位次条种款每该其此各".split(""))
+  for (let k = 0; k < m; k++) {
+    if (!isNew[k]) continue
+    const ch = b[k]
+    if (/[0-9A-Za-z%]/.test(ch)) continue              // 数据 / 英文行业名词 → 保留
+    if (PUNCT.test(ch)) { isNew[k] = false; continue }  // 标点、空白 → 不标
+    if (STOP.has(ch)) isNew[k] = false                  // 单独介词 / 助词 / 量词 → 不标
+  }
+
   // 合并连续同类片段
   const nodes: React.ReactNode[] = []
   let buf = "", flag = m > 0 ? isNew[0] : false, key = 0
@@ -1164,6 +1176,13 @@ function ResumePageInner() {
       setSavingVersion(false)
     }
   }
+
+  // 生成后自动存入历史简历(无需手动点保存);延迟片刻让两个 agent 的分析也一并写入快照
+  useEffect(() => {
+    if (!result || versionSaved || savingVersion) return
+    const t = setTimeout(() => { if (!versionSaved && !savingVersion) saveVersion() }, 900)
+    return () => clearTimeout(t)
+  }, [result]) // eslint-disable-line
 
   const exportToPDF = () => {
     if (!result) return

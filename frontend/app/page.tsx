@@ -189,23 +189,25 @@ export default function HomePage() {
       }
     } catch {}
 
+    // 素材/版本快速加载(不被慢的 AI 标签聚合阻塞)
     Promise.all([
       api.profile.getInternships().catch(() => []),
       api.profile.getProjects().catch(() => []),
       api.profile.getSkills().catch(() => []),
       api.resume.getVersions().catch(() => []),
-      api.ai.myTags().catch(() => ({ my_tags: [] })),
-    ]).then(([i, p, s, v, tags]) => {
+    ]).then(([i, p, s, v]) => {
       setInternships(i)
       setProjects(p)
       setSkills(s)
       setVersions(v)
-      setMyTags(tags.my_tags || [])
       setSelected(new Set<MaterialKey>([
         ...i.slice(0, 3).map(item => `internship-${item.id}` as MaterialKey),
         ...p.slice(0, 3).map(item => `project-${item.id}` as MaterialKey),
       ]))
     }).finally(() => setLoading(false))
+
+    // 能力标签(AI 聚合,可能较慢)独立加载,不阻塞上面的素材/版本渲染
+    api.ai.myTags().then(tags => setMyTags(tags.my_tags || [])).catch(() => {})
   }, [])
 
   useEffect(() => {
