@@ -17,8 +17,9 @@ async function proxy(request: NextRequest, path: string[]) {
     method: request.method,
     headers,
     redirect: 'follow',
-    // 快速失败:后端未启动/无响应时最多等 10s,不再长时间挂起拖慢切页
-    signal: AbortSignal.timeout(10000),
+    // 后端未启动时用 127.0.0.1 已经会立即 ECONNREFUSED;这里的超时只防"起了但卡死",
+    // 放宽到 180s 以容纳 AI 改写/分析等长耗时调用(原 10s 会误杀正常生成)。
+    signal: AbortSignal.timeout(180000),
   }
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     init.body = await request.text()

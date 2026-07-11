@@ -709,6 +709,7 @@ function ResumePageInner() {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   // 单屏模式:输入区是否展开(生成后收成一行,可展开重改)
   const [showInput, setShowInput] = useState(true)
+  const [autoGen, setAutoGen] = useState(false)   // 从首页带简历跳来时,自动直接生成(跳过中间组装台)
   const [step1Mode, setStep1Mode] = useState<"upload" | "library">("upload")
   const [resumeText, setResumeText] = useState("")
   const [jdText, setJdText] = useState("")
@@ -879,7 +880,14 @@ function ResumePageInner() {
         if (prefillJd) setJdText(prefillJd)
         if (prefillCompany) setCompany(prefillCompany)
         if (prefillPosition) setPosition(prefillPosition)
-        setStep(prefillResume ? 2 : 1)
+        if (prefillResume) {
+          // 有基础简历:跳过中间组装台,直接进入生成
+          setShowInput(false)
+          setStep(3)
+          setAutoGen(true)
+        } else {
+          setStep(1)
+        }
       } catch {}
     }
   }, [])  // eslint-disable-line
@@ -1042,6 +1050,14 @@ function ResumePageInner() {
       setLoading(false)
     }
   }
+
+  // 从首页带简历跳来:待 prefill 写入 state 后自动触发一次生成(只跑一次)
+  useEffect(() => {
+    if (autoGen && resumeText.trim() && !loading && !result) {
+      setAutoGen(false)
+      generate()
+    }
+  }, [autoGen, resumeText]) // eslint-disable-line
 
   // 后台跑「JD 需求标签 × 我的标签」匹配,结果写 localStorage 供首页能力胶囊右列「所需能力」
   // (失败静默,不阻塞主流程;改写或解读 JD 时都会触发,最近一次覆盖)
@@ -1249,8 +1265,16 @@ function ResumePageInner() {
         )}
       </div>
 
+      {/* 从首页直接进来、正在生成 */}
+      {!showInput && loading && !result && (
+        <div className="mb-4 flex items-center justify-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-8 text-sm text-[var(--text-sub)]">
+          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          正在生成适配版本，请稍候…（AI 分析 + 改写约需十几秒）
+        </div>
+      )}
+
       {/* 生成后:输入区收成一行(可展开重改) */}
-      {!showInput && (
+      {!showInput && result && (
         <button onClick={() => setShowInput(true)}
           className="w-full flex items-center justify-between gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-3 mb-4 text-left hover:border-[var(--primary)]/40 transition-colors">
           <span className="text-sm text-[var(--text-sub)] truncate">
