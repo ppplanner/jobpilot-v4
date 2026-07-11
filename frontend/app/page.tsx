@@ -95,11 +95,11 @@ function SectionHeading({ code, title, right }: { code: string; title: string; r
   )
 }
 
-function WorkCard({ children }: { children: ReactNode }) {
+function WorkCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
+    <div className={`relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 ${className}`}>
       <div className="pointer-events-none absolute inset-0" style={SHEET_GRID} />
-      <div className="relative">{children}</div>
+      <div className="relative flex h-full min-h-0 flex-col">{children}</div>
     </div>
   )
 }
@@ -274,9 +274,9 @@ export default function HomePage() {
         </button>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
-        <section className="space-y-4">
-          <div>
+      <div className="grid items-stretch gap-5 lg:h-[calc(100vh-11rem)] lg:min-h-[560px] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <section className="flex min-h-0 min-w-0 flex-col gap-4">
+          <div className="shrink-0">
             <SectionHeading code="H-01 / BASE" title="基础简历" right={<span className="text-xs text-[var(--text-muted)]">{charCount} 字</span>} />
             <WorkCard>
               <div
@@ -306,10 +306,10 @@ export default function HomePage() {
             </WorkCard>
           </div>
 
-          <div>
+          <div className="flex min-h-0 flex-1 flex-col">
             <SectionHeading code="H-02 / MATERIALS" title="素材库集合" right={<span className="text-xs text-[var(--text-muted)]">{loading ? "读取中" : `${selectedCount} 项已选`}</span>} />
-            <WorkCard>
-              <div className="max-h-[280px] space-y-2 overflow-y-auto pr-1">
+            <WorkCard className="min-h-0 flex-1">
+              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                 {internships.map(item => (
                   <MaterialToggle
                     key={`internship-${item.id}`}
@@ -354,10 +354,10 @@ export default function HomePage() {
             </WorkCard>
           </div>
 
-          <div>
+          <div className="shrink-0">
             <SectionHeading code="H-03 / VERSIONS" title="历史简历" right={<span className="text-xs text-[var(--text-muted)]">{versions.length} 份</span>} />
             <WorkCard>
-              <div className="flex gap-3 overflow-x-auto pb-1">
+              <div className="flex h-[124px] items-stretch gap-3 overflow-x-auto pb-1">
                 {versions.slice(0, 8).map(v => {
                   const score = parseScore(v.analysis_json)
                   return (
@@ -385,11 +385,11 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="space-y-4">
-          <div>
+        <section className="flex min-h-0 min-w-0 flex-col gap-4">
+          <div className="flex min-h-0 flex-1 flex-col">
             <SectionHeading code="H-04 / JD" title="目标 JD" right={<span className="text-xs text-[var(--text-muted)]">粘贴后进入匹配</span>} />
-            <WorkCard>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <WorkCard className="min-h-0 flex-1">
+              <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">
                 <input
                   value={company}
                   onChange={e => setCompany(e.target.value)}
@@ -407,9 +407,9 @@ export default function HomePage() {
                 value={jdText}
                 onChange={e => setJdText(e.target.value)}
                 placeholder="把目标岗位 JD 粘贴在这里。下一步会提取岗位要求、匹配素材经历，并进入简历改写。"
-                className="mt-3 h-[300px] w-full resize-none rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm leading-6 text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--primary)]"
+                className="mt-3 min-h-0 w-full flex-1 resize-none rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm leading-6 text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--primary)]"
               />
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <div className="mt-3 flex shrink-0 flex-wrap items-center justify-between gap-3">
                 <div className="flex gap-2 text-xs text-[var(--text-muted)]">
                   <span className="rounded-lg border border-[var(--border)] bg-white px-2 py-1">{jdText.trim().length} 字</span>
                   <span className="rounded-lg border border-[var(--border)] bg-white px-2 py-1">{latestVersion ? "可基于历史版本继续" : "可从基础简历开始"}</span>
@@ -425,11 +425,11 @@ export default function HomePage() {
             </WorkCard>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid shrink-0 gap-4 lg:grid-cols-2">
             <div>
               <SectionHeading code="H-05 / TAGS" title="基础能力标签" right={<span className="text-xs text-[var(--text-muted)]">{myTags.length} 个</span>} />
               <WorkCard>
-                <div className="flex max-h-36 flex-wrap gap-2 overflow-y-auto">
+                <div className="flex h-24 flex-wrap content-start gap-2 overflow-y-auto">
                   {myTags.slice(0, 16).map(t => <TagPill key={t.id} tag={t} />)}
                   {myTags.length === 0 && <p className="text-xs text-[var(--text-muted)]">素材库聚合后会显示你的能力标签。</p>}
                 </div>
@@ -438,7 +438,7 @@ export default function HomePage() {
             <div>
               <SectionHeading code="H-06 / REQUIREMENTS" title="最近 JD 要求" right={<span className="text-xs text-[var(--text-muted)]">{jdTags.length} 个</span>} />
               <WorkCard>
-                <div className="flex max-h-36 flex-wrap gap-2 overflow-y-auto">
+                <div className="flex h-24 flex-wrap content-start gap-2 overflow-y-auto">
                   {jdTags.slice(0, 16).map(t => <TagPill key={t.id} tag={t} />)}
                   {jdTags.length === 0 && <p className="text-xs text-[var(--text-muted)]">完成一次 JD 分析后，这里会显示岗位要求和缺口。</p>}
                 </div>

@@ -37,6 +37,7 @@
 ## 改动日志
 
 ### 2026-07-11
+- **首页双栏布局稳定化(空/满数据不挤压、两列等高、JD 不变窄、铺满)**:`app/page.tsx` 首页工作区改为固定高度栅格 + 弹性滚动区,使布局与数据量无关:① 栅格容器 `lg:h-[calc(100vh-11rem)] lg:min-h-[560px]`(固定高度而非 min-height,让内部滚动区有界→内容多时内部滚动而非撑开)+ 列宽 `minmax(0,0.9fr)_minmax(0,1.1fr)`(修右栏被长内容挤窄)+ `items-stretch`;两列 `<section>` 加 `min-h-0 min-w-0`。② 左栏 flex-col:基础简历(固定)/素材库(`flex-1` 内部 `overflow-y-auto`,占满剩余)/历史简历(固定 `h-[124px]`)。③ 右栏 flex-col:目标 JD 卡 `flex-1`、JD textarea `flex-1` 撑满(→ 右栏与左栏等高、JD 又宽又高)、标签行固定(`h-24`)。④ `WorkCard` 加 `className` 入参 + 内部 `flex h-full flex-col min-h-0` 以支持撑满。空态/满态截图确认占比一致、无 reflow。
 - **稳定存档 + 架构现状记录(测试前基线)**:当前 `/` 与 `/resume` 是**两套并行实现,有意分工**(非路由冲突):
   - `app/page.tsx` = **新首页/发起台**(独立 HomePage,+453 行):组装基础简历(粘贴/上传 + 勾选素材 + 技能)、看历史版本/能力标签、填公司/岗位/JD;点"开始匹配"→ `beginMatch()` 写 `localStorage.jobpilot_prefill_{resume,jd,company,position}` + `router.push("/resume?from_home=1")`。另有 `jobpilot_home_{resume,jd}_draft` 自动存草稿。
   - `app/resume/page.tsx` = **执行台**:`?from_home=1` 时读上述 prefill 回填,再跑双 agent(JD分析+简历分析)+ 改写。
