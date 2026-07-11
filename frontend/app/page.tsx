@@ -354,35 +354,6 @@ export default function HomePage() {
             </WorkCard>
           </div>
 
-          <div className="shrink-0">
-            <SectionHeading code="H-03 / VERSIONS" title="历史简历" right={<span className="text-xs text-[var(--text-muted)]">{versions.length} 份</span>} />
-            <WorkCard>
-              <div className="flex h-[124px] items-stretch gap-3 overflow-x-auto pb-1">
-                {versions.slice(0, 8).map(v => {
-                  const score = parseScore(v.analysis_json)
-                  return (
-                    <Link
-                      href={`/resume?version_id=${v.id}`}
-                      key={v.id}
-                      className="w-40 shrink-0 rounded-lg border border-[var(--border)] bg-white p-3 transition-colors hover:border-[var(--primary)]/45"
-                    >
-                      <div className="mb-3 flex items-center justify-between">
-                        <span className="rounded-md bg-[var(--surface)] px-2 py-1 text-xs font-semibold text-[var(--text-sub)]">版本</span>
-                        <span className="text-xs font-semibold text-[var(--primary)]">{score == null ? "--" : score}</span>
-                      </div>
-                      <p className="line-clamp-2 text-xs font-semibold leading-5 text-[var(--text-main)]">{v.version_name}</p>
-                      <p className="mt-2 text-xs text-[var(--text-muted)]">{formatDate(v.created_at)}</p>
-                    </Link>
-                  )
-                })}
-                {versions.length === 0 && (
-                  <Link href="/resume" className="flex h-28 w-40 shrink-0 items-center justify-center rounded-lg border border-dashed border-[var(--border)] bg-white text-xs text-[var(--text-muted)]">
-                    暂无历史版本
-                  </Link>
-                )}
-              </div>
-            </WorkCard>
-          </div>
         </section>
 
         <section className="flex min-h-0 min-w-0 flex-col gap-4">
@@ -425,25 +396,34 @@ export default function HomePage() {
             </WorkCard>
           </div>
 
-          <div className="grid shrink-0 gap-4 lg:grid-cols-2">
-            <div>
-              <SectionHeading code="H-05 / TAGS" title="基础能力标签" right={<span className="text-xs text-[var(--text-muted)]">{myTags.length} 个</span>} />
-              <WorkCard>
-                <div className="flex h-24 flex-wrap content-start gap-2 overflow-y-auto">
-                  {myTags.slice(0, 16).map(t => <TagPill key={t.id} tag={t} />)}
-                  {myTags.length === 0 && <p className="text-xs text-[var(--text-muted)]">素材库聚合后会显示你的能力标签。</p>}
-                </div>
-              </WorkCard>
-            </div>
-            <div>
-              <SectionHeading code="H-06 / REQUIREMENTS" title="最近 JD 要求" right={<span className="text-xs text-[var(--text-muted)]">{jdTags.length} 个</span>} />
-              <WorkCard>
-                <div className="flex h-24 flex-wrap content-start gap-2 overflow-y-auto">
-                  {jdTags.slice(0, 16).map(t => <TagPill key={t.id} tag={t} />)}
-                  {jdTags.length === 0 && <p className="text-xs text-[var(--text-muted)]">完成一次 JD 分析后，这里会显示岗位要求和缺口。</p>}
-                </div>
-              </WorkCard>
-            </div>
+          <div className="shrink-0">
+            <SectionHeading code="H-05 / VERSIONS" title="历史简历" right={<span className="text-xs text-[var(--text-muted)]">{versions.length} 份</span>} />
+            <WorkCard>
+              <div className="flex h-[124px] items-stretch gap-3 overflow-x-auto pb-1">
+                {versions.slice(0, 8).map(v => {
+                  const score = parseScore(v.analysis_json)
+                  return (
+                    <Link
+                      href={`/resume?version_id=${v.id}`}
+                      key={v.id}
+                      className="w-40 shrink-0 rounded-lg border border-[var(--border)] bg-white p-3 transition-colors hover:border-[var(--primary)]/45"
+                    >
+                      <div className="mb-3 flex items-center justify-between">
+                        <span className="rounded-md bg-[var(--surface)] px-2 py-1 text-xs font-semibold text-[var(--text-sub)]">版本</span>
+                        <span className="text-xs font-semibold text-[var(--primary)]">{score == null ? "--" : score}</span>
+                      </div>
+                      <p className="line-clamp-2 text-xs font-semibold leading-5 text-[var(--text-main)]">{v.version_name}</p>
+                      <p className="mt-2 text-xs text-[var(--text-muted)]">{formatDate(v.created_at)}</p>
+                    </Link>
+                  )
+                })}
+                {versions.length === 0 && (
+                  <Link href="/resume" className="flex h-28 w-40 shrink-0 items-center justify-center rounded-lg border border-dashed border-[var(--border)] bg-white text-xs text-[var(--text-muted)]">
+                    暂无历史版本
+                  </Link>
+                )}
+              </div>
+            </WorkCard>
           </div>
         </section>
       </div>

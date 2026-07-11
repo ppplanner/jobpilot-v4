@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, type ReactNode } from "react"
+import { api, MyTag, JdTag } from "@/lib/api"
 import { SHEET_GRID, SheetCard, SheetHeading } from "@/components/blueprint"
 
 const API = ""
@@ -59,11 +60,23 @@ const LEVEL_STYLE: Record<string, string> = {
 }
 
 export default function ProfilePage() {
-  const [tab, setTab] = useState<"basic" | "internship" | "project" | "skill">("basic")
+  const [tab, setTab] = useState<"basic" | "internship" | "project">("basic")
   const [basic, setBasic] = useState<BasicInfo>({})
   const [internships, setInternships] = useState<Internship[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [skills, setSkills] = useState<Skill[]>([])
+  // 能力总览:我的能力标签(素材库聚合) + 最近一次 JD 要求/缺口
+  const [myTags, setMyTags] = useState<MyTag[]>([])
+  const [jdTags, setJdTags] = useState<JdTag[]>([])
+  useEffect(() => {
+    api.ai.myTags().then(d => setMyTags(d.my_tags || [])).catch(() => {})
+    try { const m = localStorage.getItem("jobpilot_last_tagmatch"); if (m) setJdTags(JSON.parse(m).jd_tags || []) } catch {}
+  }, [])
+  // PM 方向即时保存(方向卡不再依赖基本信息表单的保存按钮)
+  const saveDirection = (role: string) => {
+    setBasic(b => ({ ...b, target_role: role }))
+    api.profile.updateBasic({ target_role: role }).catch(() => {})
+  }
   const [saving, setSaving] = useState(false)
   const [saveMsg, setSaveMsg] = useState("")
   // 从首页能力胶囊跳来时:?focus=internship-4 / project-2 → 切到对应 tab、滚动并高亮该素材
@@ -226,10 +239,9 @@ export default function ProfilePage() {
   }
 
   const TABS = [
-    { key: "basic",      label: "基本信息" },
+    { key: "basic",      label: "能力总览" },
     { key: "internship", label: "实习经历" },
     { key: "project",    label: "项目经历" },
-    { key: "skill",      label: "技能标签" },
   ] as const
 
   return (
@@ -252,7 +264,7 @@ export default function ProfilePage() {
                 return (
                   <button
                     key={d.key}
-                    onClick={() => setBasic({ ...basic, target_role: d.key })}
+                    onClick={() => saveDirection(d.key)}
                     className={`p-3 rounded-xl border text-left transition-all ${
                       isSelected
                         ? "border-[var(--primary)] bg-[var(--primary-bg)]"
@@ -266,7 +278,7 @@ export default function ProfilePage() {
               })}
             </div>
             <p className="text-xs text-[var(--text-muted)] mt-3">
-              当前方向：<strong className="text-[var(--primary)]">{basic.target_role || "产品经理"}</strong> ——选好后到「基本信息」点保存。
+              当前方向：<strong className="text-[var(--primary)]">{basic.target_role || "产品经理"}</strong> ——点击即保存。
             </p>
           </div>
         </SheetCard>
@@ -297,46 +309,37 @@ export default function ProfilePage() {
 
       {/* 基本信息 */}
       {tab === "basic" && (
-        <Section code="P-02 / BASIC" title="基本信息">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { key: "name",        label: "姓名",     ph: "张三" },
-              { key: "school",      label: "学校",     ph: "北京大学" },
-              { key: "major",       label: "专业",     ph: "信息管理与信息系统" },
-              { key: "degree",      label: "学历",     ph: "硕士" },
-              { key: "gpa",         label: "GPA",      ph: "3.8/4.0" },
-              { key: "graduation",  label: "毕业时间", ph: "2026-06" },
-              { key: "target_role", label: "目标岗位", ph: "B端产品经理" },
-              { key: "target_city", label: "目标城市", ph: "北京 / 上海" },
-            ].map(f => (
-              <div key={f.key}>
-                <label className={LABEL}>{f.label}</label>
-                <input
-                  value={(basic as any)[f.key] || ""}
-                  onChange={e => setBasic({ ...basic, [f.key]: e.target.value })}
-                  placeholder={f.ph}
-                  className={INPUT}
-                />
+        <div className="space-y-4">
+          <div>
+            <SheetHeading code="P-02 / ABILITY" title="我的能力标签"
+              right={<span className="text-xs text-[var(--text-muted)]">{myTags.length} 个 · 素材库聚合</span>} />
+            <SheetCard>
+              <div className="p-5 flex flex-wrap gap-2">
+                {myTags.map(t => (
+                  <span key={t.id} className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium ${t.strength === "强" ? "bg-[#E3EDE3] text-[#3C6B4E]" : "bg-[#F2E9D6] text-[#876426]"}`}>
+                    {t.label}<span className="opacity-70">{t.strength}</span>
+                  </span>
+                ))}
+                {myTags.length === 0 && <p className="text-xs text-[var(--text-muted)]">先在下方添加实习 / 项目经历，系统会自动聚合出你的能力标签。</p>}
               </div>
-            ))}
+            </SheetCard>
           </div>
-          <div className="mt-4">
-            <label className={LABEL}>个人简介（一句话介绍自己）</label>
-            <textarea
-              value={basic.self_intro || ""}
-              onChange={e => setBasic({ ...basic, self_intro: e.target.value })}
-              placeholder="如：即将毕业的信管硕士，有3段B端产品实习，熟悉SaaS工作流产品设计，目标大厂B端PM..."
-              rows={3}
-              className={INPUT + " resize-none"}
-            />
+          <div>
+            <SheetHeading code="P-02 / JD" title="最近 JD 要求 / 缺口"
+              right={<span className="text-xs text-[var(--text-muted)]">{jdTags.length} 个 · 最近一次分析</span>} />
+            <SheetCard>
+              <div className="p-5 flex flex-wrap gap-2">
+                {jdTags.map(t => (
+                  <span key={t.id} className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium ${
+                    t.status === "缺口" ? "bg-[#F1E0DA] text-[#9E4631]" : t.status === "部分" ? "bg-[#F2E9D6] text-[#876426]" : "bg-[#E3EDE3] text-[#3C6B4E]"}`}>
+                    {t.label}<span className="opacity-70">{t.status}</span>
+                  </span>
+                ))}
+                {jdTags.length === 0 && <p className="text-xs text-[var(--text-muted)]">在首页完成一次 JD 匹配后，这里会显示岗位要求与你的命中 / 缺口。</p>}
+              </div>
+            </SheetCard>
           </div>
-          <div className="mt-5">
-            <button onClick={saveBasic} disabled={saving}
-              className="px-6 py-2.5 bg-[var(--primary)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-60">
-              {saving ? "保存中..." : "保存基本信息"}
-            </button>
-          </div>
-        </Section>
+        </div>
       )}
 
       {/* 实习经历 */}
@@ -579,93 +582,6 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* 技能标签 */}
-      {tab === "skill" && (
-        <div className="space-y-4">
-          {skills.length > 0 && (
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5">
-              {SKILL_CATS.map(cat => {
-                const catSkills = skills.filter(s => s.category === cat)
-                if (!catSkills.length) return null
-                return (
-                  <div key={cat} className="mb-4 last:mb-0">
-                    <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2">{cat}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {catSkills.map(s => (
-                        <div key={s.id} className="flex items-center gap-1.5 group">
-                          <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${LEVEL_STYLE[s.level] || LEVEL_STYLE["熟练"]}`}>
-                            {s.skill_name}
-                          </span>
-                          <span className="text-xs text-[var(--text-muted)]">{s.level}</span>
-                          <button onClick={() => delSkill(s.id)}
-                            className="text-[var(--text-muted)] hover:text-[#B6634A] opacity-0 group-hover:opacity-100 transition-all text-xs">
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-
-          <Section code="P-05 / SKILL" title="添加技能">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className={LABEL}>分类</label>
-                <select value={newSkill.category} onChange={e => setNewSkill({ ...newSkill, category: e.target.value })}
-                  className={INPUT}>
-                  {SKILL_CATS.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className={LABEL}>技能名称 *</label>
-                <input value={newSkill.skill_name} onChange={e => setNewSkill({ ...newSkill, skill_name: e.target.value })}
-                  placeholder="如：Axure / SQL / JIRA" className={INPUT}
-                  onKeyDown={e => e.key === "Enter" && addSkill()} />
-              </div>
-              <div>
-                <label className={LABEL}>熟悉程度</label>
-                <select value={newSkill.level} onChange={e => setNewSkill({ ...newSkill, level: e.target.value })}
-                  className={INPUT}>
-                  {["精通", "熟练", "了解"].map(l => <option key={l} value={l}>{l}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center gap-4">
-              <button onClick={addSkill} disabled={!newSkill.skill_name}
-                className="px-5 py-2 bg-[var(--primary)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40">
-                + 添加技能
-              </button>
-              <p className="text-xs text-[var(--text-muted)]">按 Enter 快速添加</p>
-            </div>
-
-            <div className="mt-5 pt-4 border-t border-[var(--border)]">
-              <p className="text-xs text-[var(--text-muted)] mb-2">B端PM常用工具快速添加：</p>
-              <div className="flex flex-wrap gap-2">
-                {["Axure", "Figma", "Sketch", "JIRA", "Confluence", "SQL", "Python基础", "Tableau", "飞书", "Notion"].map(tool => (
-                  <button key={tool}
-                    onClick={() => {
-                      const cat = ["SQL", "Python基础", "Tableau"].includes(tool) ? "数据分析" : "产品工具"
-                      fetch(`${API}/api/v1/profile/skills`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ category: cat, skill_name: tool, level: "熟练" }),
-                      }).then(r => r.json()).then(r => {
-                        setSkills(prev => [...prev, { id: r.id, category: cat, skill_name: tool, level: "熟练" }])
-                        showMsg(`已添加 ${tool}`)
-                      }).catch(() => { })
-                    }}
-                    className="text-xs px-2.5 py-1 bg-[var(--surface2)] text-[var(--text-sub)] rounded-full hover:bg-[var(--border)] transition-colors">
-                    + {tool}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </Section>
-        </div>
-      )}
     </div>
   )
 }
