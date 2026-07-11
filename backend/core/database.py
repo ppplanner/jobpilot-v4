@@ -25,6 +25,14 @@ IS_POSTGRES = _DATABASE_URL.startswith("postgres")
 if IS_POSTGRES:
     import psycopg2
     import psycopg2.extras
+    import psycopg2.pool
+    # 连接池:复用与云端 Postgres 的连接,避免每个请求都重新建连(SSL 握手 ~1-2s)导致首页多接口串行卡顿
+    _PG_POOL = None
+    def _get_pg_pool():
+        global _PG_POOL
+        if _PG_POOL is None:
+            _PG_POOL = psycopg2.pool.ThreadedConnectionPool(1, 8, dsn=_DATABASE_URL)
+        return _PG_POOL
 else:
     _BACKEND_DIR = Path(__file__).resolve().parent.parent
     _DATA_DIR = _BACKEND_DIR / "data"
@@ -133,16 +141,25 @@ class _DBWrapper:
 @contextmanager
 def get_db():
     if IS_POSTGRES:
-        conn = psycopg2.connect(_DATABASE_URL)
+        pool = _get_pg_pool()
+        conn = pool.getconn()
         conn.autocommit = False
+        ok = True
         try:
             yield _DBWrapper(conn, is_postgres=True)
             conn.commit()
         except Exception:
-            conn.rollback()
+            ok = False
+            try: conn.rollback()
+            except Exception: pass
             raise
         finally:
-            conn.close()
+            # 正常则把连接还回池复用;异常连接可能损坏,关闭丢弃避免污染池
+            try:
+                pool.putconn(conn, close=not ok)
+            except Exception:
+                try: conn.close()
+                except Exception: pass
     else:
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row

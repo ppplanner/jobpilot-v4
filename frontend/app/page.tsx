@@ -236,6 +236,19 @@ export default function HomePage() {
     })
   }
 
+  // 全选 / 全不选(经历 + 技能集合一起切换)
+  const allMaterialKeys: MaterialKey[] = [
+    ...internships.map(i => `internship-${i.id}` as MaterialKey),
+    ...projects.map(p => `project-${p.id}` as MaterialKey),
+  ]
+  const allSelected = allMaterialKeys.length > 0
+    && allMaterialKeys.every(k => selected.has(k))
+    && (skills.length === 0 || includeSkills)
+  const toggleSelectAll = () => {
+    if (allSelected) { setSelected(new Set()); setIncludeSkills(false) }
+    else { setSelected(new Set(allMaterialKeys)); setIncludeSkills(true) }
+  }
+
   const handleFile = async (file?: File) => {
     if (!file) return
     setUploading(true)
@@ -309,7 +322,16 @@ export default function HomePage() {
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col">
-            <SectionHeading code="H-02 / MATERIALS" title="素材库集合" right={<span className="text-xs text-[var(--text-muted)]">{loading ? "读取中" : `${selectedCount} 项已选`}</span>} />
+            <SectionHeading code="H-02 / MATERIALS" title="素材库集合" right={
+              <div className="flex items-center gap-3">
+                {!loading && allMaterialKeys.length > 0 && (
+                  <button onClick={toggleSelectAll} className="text-xs font-medium text-[var(--primary)] hover:underline">
+                    {allSelected ? "全不选" : "全选"}
+                  </button>
+                )}
+                <span className="text-xs text-[var(--text-muted)]">{loading ? "读取中" : `${selectedCount} 项已选`}</span>
+              </div>
+            } />
             <WorkCard className="min-h-0 flex-1">
               <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                 {internships.map(item => (
