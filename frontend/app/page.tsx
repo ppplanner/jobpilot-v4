@@ -418,9 +418,9 @@ export default function HomePage() {
                   )
                 })}
                 {versions.length === 0 && (
-                  <Link href="/resume" className="flex h-28 w-40 shrink-0 items-center justify-center rounded-lg border border-dashed border-[var(--border)] bg-white text-xs text-[var(--text-muted)]">
-                    暂无历史版本
-                  </Link>
+                  <div className="flex h-28 w-full shrink-0 items-center justify-center rounded-lg border border-dashed border-[var(--border)] bg-white text-xs text-[var(--text-muted)]">
+                    暂无历史版本 · 在上方粘贴 JD 后开始匹配即可生成
+                  </div>
                 )}
               </div>
             </WorkCard>
