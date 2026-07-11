@@ -858,6 +858,7 @@ function ResumePageInner() {
     const p = searchParams.get("position")
     const a = searchParams.get("app_id")
     const v = searchParams.get("version_id")
+    const fromHome = searchParams.get("from_home")
     if (c) setCompany(c)
     if (p) setPosition(p)
     if (a) setLinkedAppId(a)
@@ -866,6 +867,20 @@ function ResumePageInner() {
       setStep(3)
       setShowInput(false)
       restoreVersion(Number(v))
+      return
+    }
+    if (fromHome) {
+      try {
+        const prefillResume = localStorage.getItem("jobpilot_prefill_resume") || ""
+        const prefillJd = localStorage.getItem("jobpilot_prefill_jd") || ""
+        const prefillCompany = localStorage.getItem("jobpilot_prefill_company") || ""
+        const prefillPosition = localStorage.getItem("jobpilot_prefill_position") || ""
+        if (prefillResume) handleResumeChange(prefillResume)
+        if (prefillJd) setJdText(prefillJd)
+        if (prefillCompany) setCompany(prefillCompany)
+        if (prefillPosition) setPosition(prefillPosition)
+        setStep(prefillResume ? 2 : 1)
+      } catch {}
     }
   }, [])  // eslint-disable-line
 

@@ -36,6 +36,13 @@
 
 ## 改动日志
 
+### 2026-07-11
+- **稳定存档 + 架构现状记录(测试前基线)**:当前 `/` 与 `/resume` 是**两套并行实现,有意分工**(非路由冲突):
+  - `app/page.tsx` = **新首页/发起台**(独立 HomePage,+453 行):组装基础简历(粘贴/上传 + 勾选素材 + 技能)、看历史版本/能力标签、填公司/岗位/JD;点"开始匹配"→ `beginMatch()` 写 `localStorage.jobpilot_prefill_{resume,jd,company,position}` + `router.push("/resume?from_home=1")`。另有 `jobpilot_home_{resume,jd}_draft` 自动存草稿。
+  - `app/resume/page.tsx` = **执行台**:`?from_home=1` 时读上述 prefill 回填,再跑双 agent(JD分析+简历分析)+ 改写。
+  - **已知冗余(待反馈后再动)**:`/resume` 从首页进来仍是"双栏组装台"(与首页组装重复),理想是精简为纯执行/结果;`components/Navbar.tsx`(layout 未加载)残留旧 `/resume` 入口。
+  - 排查结论:`tsc` 通过;`/` 与 `/resume` 均 200;无 Next 同名路由冲突。清理:删除了 `backend/` 下一个计划 agent 误生成的垃圾 md(文件名是转义坏的 Windows 路径)。
+
 ### 2026-07-06
 - **首页(适配台)改为双栏工作区(参考 Triply 布局)**:`resume/page.tsx` 输入区从"居中单列"改为 `grid lg:grid-cols-12` 双栏,容器 `max-w-5xl`→`max-w-6xl`(与其他页一致),标题去居中。**左栏(col-span-5,窄)**:三张卡片——基础简历(`ResumeDropZone` 拖拽上传/粘贴)、从素材库选择(`MaterialImporter` 勾选导入)、历史简历版本(复用 `VersionHistoryPanel`,点进看上次修改)。**右栏(col-span-7,宽)**:一张卡片(参考投递看板图框)——目标公司/岗位 + JD 粘贴(`JDTextArea`)+ 力度 + 生成,均复用现有功能。生成后仍走"两 agent 要点 + 双栏改写"内联展开。定位条改为左对齐全宽。功能全复用,`tsc` 通过。
   - **⚠ 环境问题(非代码)**:本会话多次重启 dev server 后,Windows 出现 `0xC0000142`(STATUS_DLL_INIT_FAILED)——Turbopack 处理 `globals.css` 时无法再 spawn PostCSS worker 子进程(desktop heap 耗尽),导致 `/` 返回 500。killall node 也不解;**需新开终端会话/注销重登后 `npm run dev` 方可**。改动本身 tsc 通过、未上屏截图待环境恢复后验收。
