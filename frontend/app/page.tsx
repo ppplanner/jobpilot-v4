@@ -158,6 +158,118 @@ function TagPill({ tag }: { tag: MyTag | JdTag }) {
   )
 }
 
+type FeatureIconType = "job" | "match" | "generate" | "optimize" | "import" | "versions"
+
+function FeatureIcon({ type, className = "" }: { type: FeatureIconType; className?: string }) {
+  const common = {
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  }
+  return (
+    <svg className={`shrink-0 text-[#101716] ${className}`} viewBox="0 0 64 64" aria-hidden="true">
+      {type === "job" && (
+        <>
+          <circle {...common} cx="20" cy="17" r="8" />
+          <path {...common} d="M8 52c2-16 23-16 27 0" />
+          <circle {...common} cx="39" cy="25" r="12" />
+          <path {...common} d="M48 34l8 8" />
+          <rect {...common} x="38" y="39" width="18" height="16" rx="3" />
+          <circle cx="47" cy="47" r="4" fill="#16856d" />
+        </>
+      )}
+      {type === "match" && (
+        <>
+          <circle {...common} cx="18" cy="17" r="7" />
+          <path {...common} d="M7 52c2-15 22-15 26 0" />
+          <rect {...common} x="34" y="12" width="22" height="38" rx="4" />
+          <path {...common} d="M40 25l4 4 8-11M40 38l4 4 8-11" />
+        </>
+      )}
+      {type === "generate" && (
+        <>
+          <circle {...common} cx="19" cy="16" r="7" />
+          <path {...common} d="M7 53c2-15 23-15 27 0" />
+          <rect {...common} x="32" y="18" width="22" height="29" rx="3" />
+          <path {...common} d="M38 29h10M38 36h8" />
+          <circle cx="51" cy="48" r="9" fill="#16856d" />
+          <path d="M47 48l3 3 6-8" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      )}
+      {type === "optimize" && (
+        <>
+          <circle {...common} cx="18" cy="18" r="7" />
+          <path {...common} d="M7 53c2-15 22-15 26 0" />
+          <rect {...common} x="33" y="12" width="22" height="15" rx="3" />
+          <path {...common} d="M39 43V30M39 43h14M46 43V25M53 43V33" />
+          <path d="M45 16h7v8h-7z" fill="#16856d" />
+        </>
+      )}
+      {type === "import" && (
+        <>
+          <path {...common} d="M9 51V19h18l4 6h24v26z" />
+          <path {...common} d="M9 27h46" />
+          <circle cx="48" cy="48" r="9" fill="#16856d" />
+          <path d="M48 53V42M43 47l5-5 5 5" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      )}
+      {type === "versions" && (
+        <>
+          <rect {...common} x="14" y="13" width="26" height="32" rx="4" />
+          <path {...common} d="M20 25h12M20 33h9" />
+          <path {...common} d="M23 9h23c3 0 5 2 5 5v25" />
+          <circle cx="46" cy="45" r="10" fill="#16856d" />
+          <path d="M42 45l3 3 7-9" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      )}
+    </svg>
+  )
+}
+
+function FeatureStrip() {
+  const items: { type: FeatureIconType; title: string; sub: string }[] = [
+    { type: "job", title: "岗位分析", sub: "拆 JD" },
+    { type: "match", title: "需求匹配", sub: "找证据" },
+    { type: "generate", title: "简历生成", sub: "成版本" },
+    { type: "optimize", title: "内容优化", sub: "改表达" },
+    { type: "versions", title: "多版本管理", sub: "可还原" },
+  ]
+  return (
+    <div className="mb-5 grid gap-3 sm:grid-cols-5">
+      {items.map(item => (
+        <div key={item.title} className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-white px-3 py-2.5">
+          <div className="pointer-events-none absolute inset-0" style={SHEET_GRID} />
+          <div className="relative flex items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-white">
+              <FeatureIcon type={item.type} className="h-9 w-9" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-semibold text-[var(--text-main)]">{item.title}</p>
+              <p className="mt-0.5 text-xs text-[var(--text-muted)]">{item.sub}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function VersionThumb({ score }: { score: number | null }) {
+  const strong = score != null && score >= 80
+  return (
+    <div className="mb-3 flex h-12 items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2">
+      <FeatureIcon type="versions" className="h-10 w-10" />
+      <span className={`rounded-full px-2 py-1 text-xs font-semibold ${
+        strong ? "bg-[#E3EDE3] text-[#3C6B4E]" : "bg-white text-[var(--primary)]"
+      }`}>
+        {score == null ? "--" : score}
+      </span>
+    </div>
+  )
+}
+
 export default function HomePage() {
   const router = useRouter()
   const fileRef = useRef<HTMLInputElement>(null)
@@ -288,8 +400,9 @@ export default function HomePage() {
           进入 JD 匹配修改 →
         </button>
       </div>
+      <FeatureStrip />
 
-      <div className="grid items-stretch gap-5 lg:h-[calc(100vh-11rem)] lg:min-h-[560px] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <div className="grid items-stretch gap-5 lg:h-[calc(100vh-16rem)] lg:min-h-[560px] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <section className="flex min-h-0 min-w-0 flex-col gap-4">
           <div className="shrink-0">
             <SectionHeading code="H-01 / BASE" title="基础简历" right={<span className="text-xs text-[var(--text-muted)]">{charCount} 字</span>} />
@@ -305,9 +418,14 @@ export default function HomePage() {
               >
                 <input ref={fileRef} type="file" className="hidden" accept=".pdf,.doc,.docx,.txt" onChange={e => handleFile(e.target.files?.[0])} />
                 <div className="flex items-center justify-between gap-3">
-                  <div>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-white">
+                      <FeatureIcon type="import" className="h-10 w-10" />
+                    </div>
+                    <div className="min-w-0">
                     <p className="text-sm font-semibold text-[var(--text-main)]">{uploading ? "正在读取文件..." : "拖动简历文件到这里"}</p>
                     <p className="mt-1 text-xs text-[var(--text-muted)]">也可以直接点击上传，或在下方粘贴基础简历文本。</p>
+                    </div>
                   </div>
                   <span className="rounded-lg bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--primary)]">上传</span>
                 </div>
@@ -333,6 +451,13 @@ export default function HomePage() {
               </div>
             } />
             <WorkCard className="min-h-0 flex-1">
+              <div className="mb-2 flex items-center gap-3 rounded-lg border border-[var(--border)] bg-white px-3 py-2">
+                <FeatureIcon type="match" className="h-9 w-9" />
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-[var(--text-main)]">先选可支撑岗位要求的经历</p>
+                  <p className="mt-0.5 text-xs text-[var(--text-muted)]">这些素材会进入下一步 JD 匹配。</p>
+                </div>
+              </div>
               <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                 {internships.map(item => (
                   <MaterialToggle
@@ -384,6 +509,13 @@ export default function HomePage() {
           <div className="flex min-h-0 flex-1 flex-col">
             <SectionHeading code="H-04 / JD" title="目标 JD" right={<span className="text-xs text-[var(--text-muted)]">粘贴后进入匹配</span>} />
             <WorkCard className="min-h-0 flex-1">
+              <div className="mb-3 flex items-center gap-3 rounded-lg border border-[var(--border)] bg-white px-3 py-2">
+                <FeatureIcon type="job" className="h-10 w-10" />
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-[var(--text-main)]">岗位分析会把 JD 拆成可匹配要求</p>
+                  <p className="mt-0.5 text-xs text-[var(--text-muted)]">公司、岗位和 JD 会一起带入简历适配台。</p>
+                </div>
+              </div>
               <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">
                 <input
                   value={company}
@@ -432,10 +564,7 @@ export default function HomePage() {
                       key={v.id}
                       className="w-40 shrink-0 rounded-lg border border-[var(--border)] bg-white p-3 transition-colors hover:border-[var(--primary)]/45"
                     >
-                      <div className="mb-3 flex items-center justify-between">
-                        <span className="rounded-md bg-[var(--surface)] px-2 py-1 text-xs font-semibold text-[var(--text-sub)]">版本</span>
-                        <span className="text-xs font-semibold text-[var(--primary)]">{score == null ? "--" : score}</span>
-                      </div>
+                      <VersionThumb score={score} />
                       <p className="line-clamp-2 text-xs font-semibold leading-5 text-[var(--text-main)]">{v.version_name}</p>
                       <p className="mt-2 text-xs text-[var(--text-muted)]">{formatDate(v.created_at)}</p>
                     </Link>

@@ -36,6 +36,9 @@
 
 ## 改动日志
 
+### 2026-07-15
+- **删除高保真稿并直接落地功能图标**:按用户要求删除 `frontend/public/jobpilot-hifi-style.html` 与 `frontend/public/jobpilot-home-icon-hifi.html`,后续不再调取这些静态设计稿。真实前端改为直接在 `frontend/components/Sidebar.tsx` 和 `frontend/app/page.tsx` 接入参考图方向的黑白线稿 + 墨绿强调图标:侧栏导航换成功能线稿图标并补充底部功能图标区,首页新增岗位分析/需求匹配/简历生成/内容优化/多版本管理链路图标,并给基础简历、素材库、目标 JD、历史版本模块加入同风格图标承接视觉。
+
 ### 2026-07-11
 - **回退简历适配台输入区固定高度尝试**:按用户“回退”要求,撤销上一轮对 `/resume` 输入区的固定高度改动,恢复 `ResumeDropZone`/`JDTextArea` 原自适应结构,右侧「目标岗位 JD」卡片恢复 `p-5 space-y-4`,左侧「基础简历」卡不再设 `lg:h-[390px]`。首页此前改动未动。
 
