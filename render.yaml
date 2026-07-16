@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: jobpilot-v4-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: LAN_MODE
+        value: "false"
+      - key: DATABASE_URL
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: "https://jobpilot.wstudio.cc"
